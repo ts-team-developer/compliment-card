@@ -71,15 +71,15 @@ export default function FixedContainer() {
 
   React.useEffect(() => {
     const fetchPosts = async () => {
-      axios.get('http://localhost:3001/getBestCardsQuery')
+      axios.get('http://localhost:3001/api/getBestCardsQuery')
       .then(({data}) => {
-        setPosts(data.lists)
+        setPosts(data[0])
       });
     }
     const fetchQuarter = async () => {
-      axios.get('http://localhost:3001/getQuarterQuery')
+      axios.get('http://localhost:3001/api/getQuarterQuery')
       .then(({data}) => {
-         setQuarterList(data.lists)
+         setQuarterList(data[0])
       });
     }
     fetchQuarter();
@@ -90,12 +90,6 @@ export default function FixedContainer() {
   return (
     <React.Fragment>
       <CssBaseline />
-      <CardMedia sx={{m:3, mb: 5, borderBottom: '1px solid #eee'}} >
-        <Typography variant="h5" component="div" sx={{fontFamily:'NanumSquare', fontWeight: 'bold', mb: 3}}>
-          우수칭찬카드
-        </Typography>
-      </CardMedia>
-
       {quarterList ? quarterList.map((quarters, key) => {
               return (
                 <div>

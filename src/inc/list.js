@@ -1,7 +1,6 @@
 import * as React from 'react';
 import axios from 'axios';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
@@ -29,10 +28,24 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import Modal from '@mui/material/Modal';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 
 import moment from 'moment';
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  boxShadow: 24,
+  p: 4,
+  zIndex: 9999999,
+  fontFamily:'Nanum Gothic'
+};
 
-const age = [];
+
 const StyledMenu = styled((props) => (
   <Menu
     elevation={0}
@@ -98,43 +111,45 @@ export default function FixedContainer() {
   const [expanded, setExpanded] = React.useState(true);
   const [posts, setPosts] = React.useState([]);
   const [quarterList, setQuarterList] = React.useState([]);
-  const [score, setScore] = React.useState(5);
+  const [score, setScore] = React.useState(0);
   const [quarter, setQuarter] = React.useState(0);
   const [cards, setCards] = React.useState(5);
   const [isClosed, setIsClosed] = React.useState(false);
   const [isRecClosed, setIsRecClosed] = React.useState(false);
   const [targetSeq, setTargetSeq] = React.useState(0);
-
   // 추천 카드 CARD_CHECK
   const [check, setChecks] = React.useState(0);
+ 
 
   React.useEffect(() => {
     const fetchPosts = async () => {
-      axios.get('http://localhost:3001/getCardsIWriteQuery')
-      .then(({data}) => {
-        setPosts(data.lists)
+      axios.get('http://localhost:3001/api/getCardsIWriteQuery', {params: {cards : cards, quarter : quarter, score: score}})
+      .then(async ({data}) => {
+        setChecks(false)
+        setPosts(data[0])
       });
     }
 
     const fetchQuarter = async () => {
-      axios.get('http://localhost:3001/getQuarterQuery')
+      axios.get('http://localhost:3001/api/getQuarterQuery')
       .then(({data}) => {
-        setQuarterList(data.lists)
-        setQuarter(data.lists[0].quarter)
+        setQuarterList(data[0])
+        //setQuarter(data[0][0].quarter)
       });
     };
 
     const fetchIsRecClose = async () => {
-      axios.get('http://localhost:3001/getIsClosedQuery')
+      axios.get('http://localhost:3001/api/getIsClosedQuery')
       .then(({data}) => {
-        setIsRecClosed(data.lists[0].isRecClosed);
+        setIsRecClosed(data[0][0].isRecClosed);
       });
     }
     fetchQuarter();
     fetchPosts();
     fetchIsRecClose();
- }, []);
+ }, [cards, check, quarter, score]);
 
+ const [opens, setOpens] = React.useState(false)
 const history = useHistory();
 const [anchorEl, setAnchorEl] = React.useState(null);
 const open = Boolean(anchorEl);
@@ -151,9 +166,20 @@ const handleClose = () => {
         <CardContent>
       
       <div>
+      <Modal
+        open={opens}
+        onClose={() => {
+          setOpens(false)
+        }}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Alert sx={style} severity="error" >자신이 칭찬한 카드는 추천할 수 없습니다.</Alert>
+      </Modal>
       <FormControl sx={{ m: 1, minWidth: 120 }}>
             <InputLabel id="demo-simple-select-label">점수</InputLabel>
-            <Select labelId="demo-simple-select-label" id="demo-simple-select" value={score} label="점수" size="small" onChange={(e) => { setScore(e.target.value) }}>
+            <Select labelId="demo-simple-select-label" id="demo-simple-select" value={score} label="점수" size="small" onChange={(e) => { setScore(e.target.value) }} readOnly={cards == 5 || cards == 2 ? true : false} >
+              <MenuItem value={0}>전체</MenuItem>
               <MenuItem value={5}>5점</MenuItem>
               <MenuItem value={4}>4점</MenuItem>
               <MenuItem value={3}>3점</MenuItem>
@@ -166,11 +192,7 @@ const handleClose = () => {
             <Select labelId="demo-simple-select-label" id="demo-simple-select" value={quarter} label="분기"  size="small" onChange={(e) => { setQuarter(e.target.value) }}>
             <MenuItem value={0}>전체보기</MenuItem>
             {quarterList ? quarterList.map((el, key) => {
-              return (
-              <MenuItem value={el.quarter}>{el.quarter}</MenuItem>
-              )
-              }) : null};
-              
+              return ( <MenuItem value={el.quarter}>{el.quarter}</MenuItem>  ) }) : null};
          
             </Select>
       </FormControl>
@@ -180,14 +202,10 @@ const handleClose = () => {
               <MenuItem value={5}>안 읽은 카드</MenuItem>
               <MenuItem value={4}>추천카드</MenuItem>
               <MenuItem value={3}>전체카드</MenuItem>
-              <MenuItem value={3}>받은카드</MenuItem>
+              <MenuItem value={2}>받은카드</MenuItem>
             </Select>
       </FormControl>
-      <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <Typography variant="body2" sx={{display: 'inline-block', verticalAlign:'middle'}}>
-              <Button size="large" variant="outlined">조회</Button>  
-          </Typography>
-      </FormControl>
+   
   </div>
           
       </CardContent>
@@ -205,7 +223,6 @@ const handleClose = () => {
             duration: theme.transitions.duration.shortest,
           }),
         })); 
-        
         const handleExpandClick = () => {
           setExpanded(!expanded);
         };
@@ -214,8 +231,8 @@ const handleClose = () => {
           <Grid item xs={12} md={4}>
             <Card variant="outlined" >    
               <CardHeader 
-                avatar={ <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe"> {el.SEQ} </Avatar> } 
-                action={
+                avatar={ <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe"> 0</Avatar> } 
+                action={ el.SENDER == '장혜진' ?
                 <div>
                 <IconButton 
                     aria-label="settings"
@@ -243,11 +260,11 @@ const handleClose = () => {
                   open={open}
                   onClose={handleClose} >
                   <MenuItem value={el.SEQ} onClick={(e) => {
-                    axios.get('http://localhost:3001/getCardsDetailQuery', {params: {seq : targetSeq}})
+                    axios.get('http://localhost:3001/api/getCardsDetailQuery', {params: {seq : targetSeq}})
                     .then(({data}) => {
                       history.push({
                         pathname : '/form',
-                        state : {forms : data.lists}
+                        state : {forms : data[0][0]}
                       })
                     });
                   
@@ -260,7 +277,7 @@ const handleClose = () => {
           삭제
         </MenuItem>
       </StyledMenu>
-                </div>
+                </div> : null
                 }
                 title={el.RECEIVER}
                 subheader={moment(el.SEND_DT).format('YYYY-MM-DD') + " " + el.SEND_TM}
@@ -275,24 +292,26 @@ const handleClose = () => {
                     </CardContent>
                     <CardActions disableSpacing>
                       {isRecClosed == 'N' ?
-                      <Rating name="size-small" defaultValue={el.EVALUATION} size="medium" onChange={(e) => {  
-                        axios.post('http://localhost:3001/doCardCheckTable', {'seq' : el.SEQ, 'evaluation' : e.target.value}).then(function (res) {
-                          if(res.status == 200) {
-
-                          } else {
-
-                          }
-                        }).catch(function (res, status, err) {
+                      <Rating name="size-small" defaultValue={cards == 5 ? 0 : el.EVALUATION}
+                      size="medium" onChange={(e) => {  
+                        axios.post('http://localhost:3001/api/doCardCheckTable', {'seq' : el.SEQ, 'evaluation' : e.target.value}).then(({data})=> {
+                          setChecks(true)
+                        }).catch(err => {
+                          setOpens(true)
                         });
+
                       }}/>
                       : null}
+                      
                       <ExpandMore aria-label="show more" expanded={!expanded}  name={el.seq} onClick={(e) => {  handleExpandClick(expanded) } } ><ExpandMoreIcon /> </ExpandMore>
                     </CardActions>
                   </Card>
+                  
                 </Grid>
               )  } ) : null}
+             
               </Grid>
-    </CardContent>
+    </CardContent> 
     </React.Fragment>
   );
 }

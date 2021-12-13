@@ -28,11 +28,12 @@ const style = {
 
 // 받는사람 LIST
 const employeeList= [];
-axios.get('http://localhost:3001/selectbody')
+axios.get('http://localhost:3001/api/selectbody')
 .then(({data}) => {
-  for(var i = 0 ; i < data.emps.length; i++) {
-    employeeList.push({label : data.emps[i].name_kor, value : data.emps[i].email})
-  }
+  console.log("test "+JSON.stringify(data[0]))
+  data[0].forEach(element => {
+    employeeList.push({label : element.name_kor, value : element.email})
+  });
 })
 
 
@@ -44,31 +45,28 @@ export default function Form(props) {
   const [open, setOpen] = React.useState(false);
 
  
-  const [error, setError] = React.useState(true);
+  const [error, setError] = React.useState(false);
   const [msg, setMsg] = React.useState('');
-  const [forms, setForms] = React.useState(props == null ? null : props.location.state.forms[0]);
+  const [forms, setForms] = React.useState(props == null ? null : props.location.state.forms);
   const [receiver, setReceiver] = React.useState(forms == null ? '' : forms.RECEIVER);
   const [content, setContent] = React.useState(forms == null ? '' : forms.CONTENT);
   const [count, setCount] = React.useState(forms == null ? 0 : forms.CONTENT.length);
+  const [seq, setSeq] = React.useState(forms == null ? 0 :forms.SEQ)
   
   // 저장버튼 클릭 이벤트
-  const handleOpen = () => {
-      axios.post('http://localhost:3001/register', {'receiver' : receiver, 'content' : content}).then(res => {
-        console.log("res1 :"+JSON.stringify(res))
+  const handleOpen = async () => {
+      axios.post('http://localhost:3001/api/register', {'receiver' : receiver, 'content' : content, 'seq' : seq}).then(res => {
         if(res.status == 200) {
           setError(false);
-          setMsg('제출되었습니다.')
         } else {
           setError(true);
-          setMsg('제출 실패')
         }
-        console.log('ss')
+        setMsg(res.data.message)
       }).catch( error => {
-        console.log("res1 :"+JSON.stringify(error))
-        console.log("yrdy "+ error.response.data.message);
-        setError(true);
         setMsg(error.response.data.message)
+        setError(true);
       });
+     
       setOpen(true);
     } 
   const resultAlert =  (<Modal open={open}
@@ -104,24 +102,29 @@ export default function Form(props) {
          
           <Autocomplete disablePortal id="combo-box-demo" sx={{ m :2, fontFamily: 'Nanum Gothic' }} options={employeeList} name="receiver" 
             renderInput={(params) => {
-        
                if(forms != null) {
                 params.inputProps.value=receiver
                }
-               
                setReceiver(params.inputProps.value)
                
-               return (<TextField {...params} label="받는사람" required error={error} value={receiver}  helperText={"* 타 팀을 먼저 칭찬해주세요. "} />)
+               return (<TextField {...params} label="받는사람" required error={error} value={receiver}  helperText={msg} />)
              }
-            } />
+            
+            }   onChange={(e, params) => {
+              setReceiver(params.label)
+            }}/>
 
           <TextField multiline id="outlined-multiline-static" label="칭찬내용" placeholder="칭찬내용" rows={10} name="content"  required
           helperText={"* 내용은 100자 이상 입력해주세요. ["+count+"자 입력 중]"} value={content}
-          error={count<100}
+          error={error}
                      onChange={(event) => {
                        setCount(event.target.value.length)
                        setContent(event.target.value);
-                     
+                       if(count < 100) {
+                         setError(true)
+                       } else {
+                         setError(false)
+                       }
                     }} sx={{ m : 2, mt : 0, width : '97%', fontFamily: 'NanumSquare' }} />
         </Box>
         

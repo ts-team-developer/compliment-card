@@ -21,7 +21,6 @@ pool.getConnection((err, connection) => {
 
 
 
-
 router.get('/selectbody', async(req, res, next) => {
     try{
         let connection = await pool.getConnection(async conn => conn)
@@ -45,7 +44,7 @@ router.get('/getCardsIWriteQuery', async(req, res, next) => {
         else quarterSql = quarter;
 
         if(cards == 5) {
-            sql += " SELECT SEQ, QUARTER, SENDER, RECEIVER, CONTENT, SEND_DT, SEND_TM FROM praise_card_202111 P WHERE  sender <> '장혜진' and NOT EXISTS (SELECT 'x' FROM card_check_202111 C WHERE C.seq = P.seq AND name_kor = '장혜진')"
+            sql += " SELECT SEQ, QUARTER, SENDER, RECEIVER, CONTENT, SEND_DT, SEND_TM FROM praise_card_202111 P WHERE  sender <> '"+req.user.email+"' and NOT EXISTS (SELECT 'x' FROM card_check_202111 C WHERE C.seq = P.seq AND name_kor = '장혜진')"
             sql += " AND QUARTER = '" + quarterSql + "' "
         } else if(cards == 4) {
             sql += " SELECT p.SEQ, p.QUARTER, p.SENDER, p.RECEIVER, p.CONTENT, SUM(c.evaluation) AS EVALUATION, SEND_DT, SEND_TM "
@@ -138,11 +137,11 @@ router.all('/doCardCheckTable', async(req, res, next) => {
 // 칭찬카드 등록
 router.post('/register', async(req, res, next) => {
     let connection = await pool.getConnection(async conn => conn)
-    
     const {receiver, content, seq} = req.body;
-
+    const sender = req.user.email;
+    
     const detailCard = await connection.query("SELECT * FROM PRAISE_CARD_202111 WHERE SEQ = " + seq);
-    const oriReceiver = detailCard[0][0].receiver;
+    const oriReceiver = seq > 0 ? detailCard[0][0].receiver : receiver;
 
     let result = ((seq == 0) ? true : (receiver != oriReceiver));
     // 받은사람 중복확인

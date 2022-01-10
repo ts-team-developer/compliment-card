@@ -71,13 +71,13 @@ export default function FixedContainer() {
 
   React.useEffect(() => {
     const fetchPosts = async () => {
-      axios.get('http://localhost:3001/api/getBestCardsQuery')
+      axios.get('/api/getBestCardsQuery')
       .then(({data}) => {
         setPosts(data[0])
       });
     }
     const fetchQuarter = async () => {
-      axios.get('http://localhost:3001/api/getQuarterQuery')
+      axios.get('/api/getQuarterQuery')
       .then(({data}) => {
          setQuarterList(data[0])
       });

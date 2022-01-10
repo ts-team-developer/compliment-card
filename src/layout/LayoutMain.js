@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import { Form , List, GradeList, Status } from '../index.js';
+import { Form , List, GradeList, Status, Setting } from '../index.js';
 
 
 class LayoutMain extends Component {
@@ -27,6 +27,7 @@ class LayoutMain extends Component {
                                     <Route path='/view/list' component = {() => <List  userLogin ={this.props.userLogin}/>}   />
                                     <Route path='/view/gradelist' component = {() => <GradeList  userLogin ={this.props.userLogin}/>}   />
                                     <Route path='/view/status' component = {() => <Status  userLogin ={this.props.userLogin}/>}   />
+                                    <Route path='/view/setting' component = {() => <Setting  userLogin ={this.props.userLogin}/>}   />
                                 </Box>
                             </CardContent>
                         </Card>

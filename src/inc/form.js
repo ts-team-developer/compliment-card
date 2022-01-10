@@ -1,5 +1,4 @@
-import React, {Component, useEffect, useRef, useState} from 'react';
-import { useHistory } from "react-router-dom";
+import React from 'react';
 import axios from 'axios';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
@@ -11,9 +10,7 @@ import CardMedia from '@mui/material/CardMedia';
 import { Link } from 'react-router-dom';
 import Autocomplete from '@mui/material/Autocomplete';
 import CardActions from '@mui/material/CardActions';
-import Modal from '@mui/material/Modal';
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
+import Alim from '../modal/alert'; 
 
 // 모달창 스타일
 const style = {
@@ -28,59 +25,66 @@ const style = {
 
 // 받는사람 LIST
 const employeeList= [];
-axios.get('http://localhost:3001/api/selectbody')
-.then(({data}) => {
-  console.log("test "+JSON.stringify(data[0]))
-  data[0].forEach(element => {
-    employeeList.push({label : element.name_kor, value : element.email})
-  });
+  axios.get('/api/selectbody')
+  .then(({data}) => {
+    data[0].forEach(element => {
+      employeeList.push({label : element.name_kor, value : element.email})
+    });
 })
 
 
 export default function Form(props) {
-  if (!props.location.state) props = null;
-  // props = React.useState(null)
-  // 페이지 이동을 위한 변수 선언
-  const history = useHistory();
-  const [open, setOpen] = React.useState(false);
-
+  const [result, setResult] = React.useState({ status : '', open : false,  msg : '', url : ''});
+  const [form, setForm] = React.useState({receiver : '', content : '', seq : ''});
  
-  const [error, setError] = React.useState(false);
-  const [msg, setMsg] = React.useState('');
-  const [forms, setForms] = React.useState(props == null ? null : props.location.state.forms);
-  const [receiver, setReceiver] = React.useState(forms == null ? '' : forms.RECEIVER);
-  const [content, setContent] = React.useState(forms == null ? '' : forms.CONTENT);
-  const [count, setCount] = React.useState(forms == null ? 0 : forms.CONTENT.length);
-  const [seq, setSeq] = React.useState(forms == null ? 0 :forms.SEQ)
+  const [receiver, setReceiver] = React.useState(props.forms == null ? '' : props.forms.RECEIVER);
+  const [content, setContent] = React.useState(props.forms == null ? '' : props.forms.CONTENT);
+  const [count, setCount] = React.useState(props.forms == null ? 0 : props.forms.CONTENT.length);
+  const [seq, setSeq] = React.useState(props.forms == null ? 0 : props.forms.SEQ)
   
   // 저장버튼 클릭 이벤트
   const handleOpen = async () => {
-      axios.post('http://localhost:3001/api/register', {'receiver' : receiver, 'content' : content, 'seq' : seq}).then(res => {
+      axios.post('/api/register', {'receiver' : receiver, 'content' : content, 'seq' : seq}).then(res => {
         if(res.status == 200) {
-          setError(false);
+          setResult({
+            ...result,
+            status : 'success',
+            msg : '제출되었습니다.',
+            url : '/view/list',
+            open : true
+          })
         } else {
-          setError(true);
+          setResult({
+            ...result,
+            status : 'error',
+            msg : res.data.message,
+            url : '',
+            open : true
+          })
         }
-        setMsg(res.data.message)
       }).catch( error => {
-        setMsg(error.response.data.message)
-        setError(true);
+        setResult({
+          ...result,
+          status : 'error',
+          msg : error,
+          url : '',
+          open : true
+        })
       });
-     
-      setOpen(true);
     } 
-  const resultAlert =  (<Modal open={open}
-      onClose={() => { error ? setOpen(false) :  history.push('/list') }}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description">
-   <Alert severity={error ? 'error' : 'success'}  sx={style}  onClose={() => {  error ? setOpen(false) :  history.push('/list') }}>
-     <Typography id="modal-modal-title" variant="h6" component="h2">
-     <AlertTitle>알림</AlertTitle>
-     </Typography>
-     <Typography id="modal-modal-description" sx={{ mt: 2 }}>{msg}</Typography>
-     </Alert>
- </Modal>)
   ;
+
+  React.useEffect(() => {
+    if(props.userLogin.quarter == null) {
+      setResult({
+        ...result,
+        status : 'error',
+        msg : '칭찬카드 작성 기간이 아닙니다.',
+        url : '/view/list',
+        open : true
+      })
+    }
+  } , []);
 
   return (
      <React.Fragment>
@@ -102,12 +106,12 @@ export default function Form(props) {
          
           <Autocomplete disablePortal id="combo-box-demo" sx={{ m :2, fontFamily: 'Nanum Gothic' }} options={employeeList} name="receiver" 
             renderInput={(params) => {
-               if(forms != null) {
+               if(props.forms != null) {
                 params.inputProps.value=receiver
                }
                setReceiver(params.inputProps.value)
                
-               return (<TextField {...params} label="받는사람" required error={error} value={receiver}  helperText={msg} />)
+               return (<TextField {...params} label="받는사람" required error={result.error} value={receiver}  helperText={result.msg} />)
              }
             
             }   onChange={(e, params) => {
@@ -116,24 +120,32 @@ export default function Form(props) {
 
           <TextField multiline id="outlined-multiline-static" label="칭찬내용" placeholder="칭찬내용" rows={10} name="content"  required
           helperText={"* 내용은 100자 이상 입력해주세요. ["+count+"자 입력 중]"} value={content}
-          error={error}
+          error={result.error}
                      onChange={(event) => {
                        setCount(event.target.value.length)
                        setContent(event.target.value);
                        if(count < 100) {
-                         setError(true)
+                        setResult({
+                          ...result,
+                          status : 'error',
+                          open : false
+                        })
                        } else {
-                         setError(false)
+                        setResult({
+                          ...result,
+                          status : 'info',
+                          open : false
+                        })
                        }
                     }} sx={{ m : 2, mt : 0, width : '97%', fontFamily: 'NanumSquare' }} />
         </Box>
         
         </CardContent>
         <CardActions sx={{m : 2, float:'right'}}>
-          <Button size="small" variant="contained" sx={{mr:1, fontFamily: 'NanumSquare'}} onClick={handleOpen}> {forms == null ? "저장" : "수정"}</Button>
-          {resultAlert}
-          <Link to="/list" style={{ textDecoration: 'none', color: 'white', fontFamily: 'NanumSquare' }}  >
-              <Button size="small" variant="outlined" to="/list" >목록</Button>
+          <Button size="small" variant="contained" sx={{mr:1, fontFamily: 'NanumSquare'}} onClick={handleOpen}> {props.forms == null ? "저장" : "수정"}</Button>
+          <Alim open={result.open} status={result.status} msg={result.msg} url={result.url}  />
+          <Link to="/view/list" style={{ textDecoration: 'none', color: 'white', fontFamily: 'NanumSquare' }}  >
+              <Button size="small" variant="outlined" to="/view/list" >목록</Button>
           </Link>
         </CardActions>
       </React.Fragment>

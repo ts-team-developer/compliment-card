@@ -30,9 +30,10 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Modal from '@mui/material/Modal';
 import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-
+import { Link } from 'react-router-dom';
 import moment from 'moment';
+import Stack from '@mui/material/Stack';
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -91,7 +92,7 @@ const card = (
     <React.Fragment>
       <CardMedia sx={{m:3, borderBottom: '1px solid #eee'}} >
         <Typography variant="h5" component="div" sx={{fontFamily:'NanumSquare', fontWeight: 'bold'}}>
-          평가방법 
+          평가방법
         </Typography>
         
         <Typography variant="body2" sx={{ mt : 4, mb: 4, fontFamily:'NanumSquare' }}>
@@ -107,7 +108,7 @@ const card = (
 
 
 
-export default function FixedContainer() {
+export default function List(users) {
   const [expanded, setExpanded] = React.useState(true);
   const [posts, setPosts] = React.useState([]);
   const [quarterList, setQuarterList] = React.useState([]);
@@ -119,11 +120,10 @@ export default function FixedContainer() {
   const [targetSeq, setTargetSeq] = React.useState(0);
   // 추천 카드 CARD_CHECK
   const [check, setChecks] = React.useState(0);
- 
-
+  
   React.useEffect(() => {
     const fetchPosts = async () => {
-      axios.get('http://localhost:3001/api/getCardsIWriteQuery', {params: {cards : cards, quarter : quarter, score: score}})
+      axios.get('/api/getCardsIWriteQuery', {params: {cards : cards, quarter : quarter, score: score}})
       .then(async ({data}) => {
         setChecks(false)
         setPosts(data[0])
@@ -131,7 +131,7 @@ export default function FixedContainer() {
     }
 
     const fetchQuarter = async () => {
-      axios.get('http://localhost:3001/api/getQuarterQuery')
+      axios.get('/api/getQuarterQuery')
       .then(({data}) => {
         setQuarterList(data[0])
         //setQuarter(data[0][0].quarter)
@@ -139,7 +139,7 @@ export default function FixedContainer() {
     };
 
     const fetchIsRecClose = async () => {
-      axios.get('http://localhost:3001/api/getIsClosedQuery')
+      axios.get('/api/getIsClosedQuery')
       .then(({data}) => {
         setIsRecClosed(data[0][0].isRecClosed);
       });
@@ -149,34 +149,39 @@ export default function FixedContainer() {
     fetchIsRecClose();
  }, [cards, check, quarter, score]);
 
- const [opens, setOpens] = React.useState(false)
-const history = useHistory();
-const [anchorEl, setAnchorEl] = React.useState(null);
-const open = Boolean(anchorEl);
-const handleClick = (event) => {
-  setAnchorEl(event.currentTarget);
-};
-const handleClose = () => {
-  setAnchorEl(null);
-};
+  const [opens, setOpens] = React.useState(false)
+  const history = useHistory();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+
+
   return (
     <React.Fragment>
       <CssBaseline />
         {card}
         <CardContent>
-      
-      <div>
-      <Modal
-        open={opens}
-        onClose={() => {
-          setOpens(false)
-        }}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Alert sx={style} severity="error" >자신이 칭찬한 카드는 추천할 수 없습니다.</Alert>
-      </Modal>
-      <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <div>
+          <Modal
+          open={opens}
+          onClose={() => {
+            setOpens(false)
+          }}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          >
+          <Alert sx={style} severity="error" >자신이 칭찬한 카드는 추천할 수 없습니다.</Alert>
+        </Modal>
+
+        <FormControl sx={{ m: 1, minWidth: 120 }}>
             <InputLabel id="demo-simple-select-label">점수</InputLabel>
             <Select labelId="demo-simple-select-label" id="demo-simple-select" value={score} label="점수" size="small" onChange={(e) => { setScore(e.target.value) }} readOnly={cards == 5 || cards == 2 ? true : false} >
               <MenuItem value={0}>전체</MenuItem>
@@ -186,16 +191,18 @@ const handleClose = () => {
               <MenuItem value={2}>2점</MenuItem>
               <MenuItem value={1}>1점</MenuItem>
             </Select>
-      </FormControl>
-      <FormControl sx={{ m: 1, minWidth: 120 }}>
-            <InputLabel id="demo-simple-select-label">분기</InputLabel>
-            <Select labelId="demo-simple-select-label" id="demo-simple-select" value={quarter} label="분기"  size="small" onChange={(e) => { setQuarter(e.target.value) }}>
-            <MenuItem value={0}>전체보기</MenuItem>
-            {quarterList ? quarterList.map((el, key) => {
-              return ( <MenuItem value={el.quarter}>{el.quarter}</MenuItem>  ) }) : null};
-         
-            </Select>
-      </FormControl>
+        </FormControl>
+
+        <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <InputLabel id="demo-simple-select-label">분기</InputLabel>
+              <Select labelId="demo-simple-select-label" id="demo-simple-select" value={quarter} label="분기"  size="small" onChange={(e) => { setQuarter(e.target.value) }}>
+              <MenuItem value={0}>전체보기</MenuItem>
+              {quarterList ? quarterList.map((el, key) => {
+                return ( <MenuItem value={el.quarter}>{el.quarter}</MenuItem>  ) }) : null};
+          
+              </Select>
+        </FormControl>
+
       <FormControl sx={{ m: 1, minWidth: 120 }}>
             <InputLabel id="demo-simple-select-label">카드</InputLabel>
             <Select labelId="demo-simple-select-label" id="demo-simple-select" value={cards} label="카드"  size="small"  onChange={(e) => { setCards(e.target.value) }}>
@@ -205,7 +212,12 @@ const handleClose = () => {
               <MenuItem value={2}>받은카드</MenuItem>
             </Select>
       </FormControl>
-   
+      {users.userLogin.quarter != "" ?
+      <Stack  direction="row" style={{ float:'right' }}>
+      <Link to="/view/form" style={{ textDecoration: 'none', color: 'white' }}  > <Button  variant="contained"> 메시지작성</Button></Link>
+    </Stack>
+    : null  
+    }
   </div>
           
       </CardContent>
@@ -260,10 +272,10 @@ const handleClose = () => {
                   open={open}
                   onClose={handleClose} >
                   <MenuItem value={el.SEQ} onClick={(e) => {
-                    axios.get('http://localhost:3001/api/getCardsDetailQuery', {params: {seq : targetSeq}})
+                    axios.get('/api/getCardsDetailQuery', {params: {seq : targetSeq}})
                     .then(({data}) => {
                       history.push({
-                        pathname : '/form',
+                        pathname : '/view/form',
                         state : {forms : data[0][0]}
                       })
                     });
@@ -294,7 +306,7 @@ const handleClose = () => {
                       {isRecClosed == 'N' ?
                       <Rating name="size-small" defaultValue={cards == 5 ? 0 : el.EVALUATION}
                       size="medium" onChange={(e) => {  
-                        axios.post('http://localhost:3001/api/doCardCheckTable', {'seq' : el.SEQ, 'evaluation' : e.target.value}).then(({data})=> {
+                        axios.post('/api/doCardCheckTable', {'seq' : el.SEQ, 'evaluation' : e.target.value}).then(({data})=> {
                           setChecks(true)
                         }).catch(err => {
                           setOpens(true)

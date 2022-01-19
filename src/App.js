@@ -1,52 +1,61 @@
 import React, { Component } from 'react';
-import LayoutHeader from './layout/LayoutHeader';
-import LayoutMain from './layout/LayoutMain';
-import axios from 'axios'
+import { Route, Switch } from 'react-router-dom';
+import axios from 'axios';
+import LayoutMain from './layout/LayoutMain'
+import LayoutHeader from './layout/LayoutHeader'
+import NotFound from './error/NotFound'
+
 
 class App extends Component {
-  state = {
-    users : {
-      name : '',
-      email: ''
-    },
-    email:''    
-  };
-
-  componentDidMount() {
-    
-
-  }
-
   constructor(props) {
-    super(props) 
-    axios.get('/auth/isAuthenticated')
-      .then(async ({data}) => {
-        if(data == null) {
-          window.location.href="/auth/login/google"
-        } else {
-          let userLogin = {
-            ...data
-          }
+    super(props) ;
+    
+    this.state = {
+      title : '',
+      content : '',
+      sub : '',
+      menuList : [],
+      quarterInfo : {},
+      userInfo : {}
+    }
+
+    axios.get('/auth/isAuthenticated').then(async ({data}) => {
+       if(data == null) {
+         window.location.href= '/auth/login/google'; 
+       } else {
           this.setState({
-            name : data.name.familyName + '' + data.name.givenName,
-            users : {
-              ...userLogin
+            menuList : data.menuList,
+            quarterInfo : data.quarterInfo,
+            userInfo : {
+              name : `${data.name.familyName} ${data.name.givenName}`,
+              email : data.email
             }
           })
-        }
-      });
-
+       }
+    });
   }
-
 
   render() {
-      return (
-        <div>
-          <LayoutHeader userLogin = {this.state.users}/>
-          <LayoutMain userLogin = {this.state.users}/>
-        </div>
-      );
-    }
+    
+                   
+    return (
+      <React.Fragment>
+        
+          <Switch>
+            {this.state.menuList.map((menu, index) => {
+              return (
+                <Route exact path={menu.MENU_URL} component = {() => 
+                  <LayoutMain url={menu.MENU_URL} menuList = {this.state.menuList}  quarterInfo={this.state.quarterInfo} userInfo={this.state.userInfo} >
+                    <LayoutHeader menus={this.state.menuList} quarterInfo={this.state.quarterInfo} userInfo={this.state.userInfo}/>
+                  </LayoutMain>
+                  }/>)
+                }
+              )}
+              <Route component = {() => <NotFound />}   />
+            </Switch>
+          </React.Fragment>
+    );    
   }
+}
 
 export default App;

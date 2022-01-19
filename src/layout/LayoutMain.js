@@ -1,40 +1,45 @@
 import React, {Component} from 'react';
-import { Route } from 'react-router-dom';
-import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import { Form , List, GradeList, Status, Setting } from '../index.js';
+import FormLayout from '../inc/form/FormLayout';
+import ListLayout from '../inc/list/ListLayout';
 
+import {GradeList, Status, Setting } from '../index.js';
 
 class LayoutMain extends Component {
     constructor(props) {
         super(props)
     }
-  
+
     render() {
+        console.log(`layoutMain : ${JSON.stringify(this.props)}`)
+        const layoutMain = () => {
+            if(this.props.url == '/view/form') {
+                return (<FormLayout/>);
+            } else if(this.props.url == '/view/list') {
+                return (<ListLayout quarterInfo={this.props.quarterInfo}/>);
+            } else if(this.props.url =='/view/gradelist'){
+                return (<GradeList/>)
+            }else if(this.props.url == '/view/status') {
+                return (<Status/>)
+            } else if(this.props.url=='/view/setting') {
+                return (<Setting/>)
+            } 
+        }
+
         return (
             <React.Fragment>
-                <CssBaseline />
+                {this.props.children}
                 <Container fixed >
                     <Box sx={{ bgcolor: 'none', height: '100vh' }} sx={{ mt: 10 }} >
-                            <Card variant="outlined" sx={{mb : 10, pt: 3}}>
-                           
-                            <CardContent>
-                                <Box  component="form" noValidate  autoComplete="off"  > 
-                                    <Route path='/view/form' component = {() => <Form userLogin ={this.props.userLogin}/>}   />
-                                    <Route path='/view/list' component = {() => <List  userLogin ={this.props.userLogin}/>}   />
-                                    <Route path='/view/gradelist' component = {() => <GradeList  userLogin ={this.props.userLogin}/>}   />
-                                    <Route path='/view/status' component = {() => <Status  userLogin ={this.props.userLogin}/>}   />
-                                    <Route path='/view/setting' component = {() => <Setting  userLogin ={this.props.userLogin}/>}   />
-                                </Box>
-                            </CardContent>
-                        </Card>
+                        <Box component="form" noValidate  autoComplete="off"  > 
+                            {layoutMain()}
+                        </Box>
                     </Box>
                 </Container>
-    </React.Fragment>
-        )
+                
+            </React.Fragment>
+        );
     }
 }
 

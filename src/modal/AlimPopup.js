@@ -14,36 +14,20 @@ const style = {
     p: 4,
   };
 
+
 class Alim extends Component {
-   
     constructor(props) {
         super(props);
-        this.state = {
-            open : props.open
-        }
-        
-        this.handleClose = this.handleClose.bind(this);
     }
-
-    handleClose = () => {
-        this.setState({
-            open : false
-        })
-        
-        if(this.props.status == 'error') {
-            window.location = this.props.url
-        } 
-    }
-
     render () {
         return (
             <div>
-                <Modal open={this.state.open} onClose={this.handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
-                    <Alert severity={this.props.status}  sx={style}  onClose={this.handleClose}>
+                <Modal open={this.props.open} onClose={this.props.handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+                    <Alert severity={this.props.error ? 'error' : 'success'}  sx={style}  onClose={this.props.handleClose}>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
-                            <AlertTitle>{this.props.status}</AlertTitle>
+                            <AlertTitle sx={{fontFamily : 'NanumGothic'}}>{this.props.error ? 'error' : 'success'}</AlertTitle>
                         </Typography>
-                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>{this.props.msg}</Typography>
+                        <Typography id="modal-modal-description" sx={{ mt: 2, fontFamily : 'NanumGothic' }}>{this.props.msg}</Typography>
                     </Alert>
                 </Modal>
             </div>

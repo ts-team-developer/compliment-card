@@ -16,8 +16,8 @@ const middleware = applyMiddleware(thunkMiddleware);
 const store = createStore(rootReducer, composeWithDevTools(middleware));
 
 export { default as Main }  from './layout/LayoutMain';
-export { default as Form } from './inc/form';
-export { default as List } from './inc/list'
+export { default as Form } from './inc/Form';
+export { default as List } from './inc/List'
 export { default as Status } from './inc/status'
 export { default as Setting } from './inc/setting'
 export { default as GradeList } from './inc/gradelist'

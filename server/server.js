@@ -1,4 +1,3 @@
-const {request, response} = require('express')
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -51,6 +50,7 @@ passportConfig()
 // router
 app.use('/api', route);
 app.use('/auth', require('./routes/login'));
+app.use('/menu', require('./routes/menu'));
 
 const http = require('http').createServer(app);
 http.listen(port, ()=>{

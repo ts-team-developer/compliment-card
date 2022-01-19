@@ -33,14 +33,16 @@ module.exports = () => {
           passReqToCallback   : true
         }, async function(request, accessToken, refreshToken, profile, done){
             try{
+                // 여기서 갱신 token
+                // idaccesstoken vs accesstoken.
+                //////// 
+                //accesstoken. 인증 : 로그인하면 idaccesstoken 발급, accesstoken
                 let connection = await pool.getConnection(async conn => conn)
                 const data = await connection.query("SELECT WORK_STS FROM EMP WHERE EMAIL ='" + profile.emails[0].value + "'")
                 connection.release();
                 if(data[0][0].WORK_STS == "1") {
-                    console.log('test')
                     return done(null, {'uid' : profile.id, 'name' : profile.name, 'picture' : profile.photos[0].value, 'email' : profile.emails[0].value, 'token' : accessToken });
                 }else {
-                    console.log('test')
                     return done('fail', null)
                 }
                 

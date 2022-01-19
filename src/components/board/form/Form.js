@@ -7,7 +7,7 @@ import TextField from '@mui/material/TextField';
 import { Link, useHistory } from 'react-router-dom';
 import Autocomplete from '@mui/material/Autocomplete';
 import CardActions from '@mui/material/CardActions';
-import AlimPopup from '../modal/AlimPopup'
+import AlimPopup from '../../modal/AlimPopup'
 import {useLocation} from "react-router";
 
 // 받는사람 LIST

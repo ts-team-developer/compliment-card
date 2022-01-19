@@ -4,13 +4,13 @@ import CssBaseline from '@mui/material/CssBaseline';
 import CardContent from '@mui/material/CardContent';
 
 import Grid from '@mui/material/Grid';
-import AlimPopup from '../modal/AlimPopup'
+import AlimPopup from '../../modal/AlimPopup'
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import moment from 'moment';
-import PraiseCard from './list/PraiseCard';
+import PraiseCard from './PraiseCard';
 import {useLocation} from "react-router";
 
 export default function List(props) {

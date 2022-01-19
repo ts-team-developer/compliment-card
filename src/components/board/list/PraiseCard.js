@@ -13,7 +13,7 @@ import Link from '@mui/material/Link';
 
 import ConfirmPopup from '../../modal/ConfirmPopup';
 import AlimPopup from '../../modal/AlimPopup';
-import Evaluation from '../list/Evaluation'
+import Evaluation from './Evaluation'
 import axios from 'axios';
 
 export default function PraiseCard(props) {

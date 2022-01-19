@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import FormLayout from '../inc/form/FormLayout';
-import ListLayout from '../inc/list/ListLayout';
+import FormLayout from '../board/form/FormLayout';
+import ListLayout from '../board/list/ListLayout';
 
-import {GradeList, Status, Setting } from '../index.js';
+import {GradeList, Status, Setting } from '../../index.js';
 
 class LayoutMain extends Component {
     constructor(props) {

@@ -1,24 +1,26 @@
 const express  = require('express');
 var router   = express.Router();
 var passport = require('passport');
-const pool = require('../config/pool')
 
 router.get('/isAuthenticated', async (req, res, next) => {
   try{
+    
     if(req.user === undefined) {
       res.json(null)
+      console.log("2")
     } else {
-     
+      console.log("21")
       res.json(req.user)
     }
-    console.log("req.user "+JSON.stringify(req.user))
   }catch(err) {
     res.json(null)
   }
 })
-
-
-
+// idToken 
+router.post('/login', async (req, res, next)=>{
+    res.redirect('/auth/login/google');
+  }
+);
 
 router.all('/login/google', 
   passport.authenticate('google', { scope: ['email', 'profile'] }), function(req, res) {

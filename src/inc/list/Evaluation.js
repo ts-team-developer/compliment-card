@@ -17,8 +17,8 @@ class Evaluation extends Component{
     }
     
     render() {
-        
-        if(this.props.isRecPeriodYn) <Rating name="size-small" defaultValue={this.props.evaluation} size="medium" onChange={handleChange} />
+        console.log(this.props.isRecPeriodYn)
+        if(this.props.isRecPeriodYn) <Rating name="size-small" defaultValue={this.props.evaluation} size="medium" onChange={this.handleChange} />
         else return null;
     }
 }

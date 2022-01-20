@@ -7,7 +7,6 @@ router.get('/isAuthenticated', async (req, res, next) => {
     
     if(req.user === undefined) {
       res.json(null)
-      console.log("2")
     } else {
       console.log("21")
       res.json(req.user)

@@ -28,7 +28,7 @@ module.exports = () => {
   
   // 매개변수 user는 req.session.passport에 저장된 값
   passport.deserializeUser(async function(user, done) {
-    console.log(``)
+    console.log(`${JSON.stringify(user)}`)
     let connection = await pool.getConnection(async conn => conn)
     const data = await connection.query("SELECT QUARTER, ISCLOSED, ISRECCLOSED FROM CLOSED  ORDER BY QUARTER DESC LIMIT 0, 1 ");
     const menu = await connection.query(`SELECT * FROM MENU A INNER JOIN ROLEMENU B ON A.MENU_ID = B.MENU_ID INNER JOIN EMP C ON B.ROLE_CD = C.AUTH WHERE C.EMAIL = '${user.email}' ORDER BY ORDER_SQ `)

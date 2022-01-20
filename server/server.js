@@ -14,13 +14,28 @@ const passportConfig = require('./config/passport')
 app.use("/view",express.static(path.join(__dirname, '..', 'build')));
 app.use(cookieParser());
 
+app.get("/", function (req, res) {
+    if(req.user === undefined) {
+        res.redirect('/auth/login/google')
+    } else {
+        res.redirect('/view/list')
+    }
+})
+
 app.get("/view", function (req, res) {
-    res.sendFile(path.join(__dirname, '../build/index.html'));
+    if(req.user === undefined) {
+        res.redirect('/auth/login/google')
+    } else {
+        res.sendFile(path.join(__dirname, '../build/index.html'));
+    }
 });
 
 app.get("/view/*", function (req, res) {
     res.sendFile(path.resolve(__dirname, '../build/index.html'));
 });
+app.get((req,res) => {
+    res.redirect('/view/notFound')
+})
 
 app.use(cors({
     origin: true,

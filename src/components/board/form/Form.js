@@ -54,7 +54,12 @@ export default function Form(props) {
     axios.get('/api/getIsClosedQuery').then(({data}) => {
       if(data[0][0]) {
         if(data[0][0].isClosed == 'Y') {
-          history.push('/view/list')
+          setResult({...result , 
+            open : true,
+            error : false, 
+            message : '칭찬카드 작성기간이 아닙니다. ',
+            url : '/view/list'
+          });
         }
       }
     });

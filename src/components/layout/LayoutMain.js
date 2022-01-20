@@ -6,13 +6,14 @@ import ListLayout from '../board/list/ListLayout';
 
 import {GradeList, Status, Setting } from '../../index.js';
 
+
 class LayoutMain extends Component {
     constructor(props) {
         super(props)
     }
 
     render() {
-        console.log(`layoutMain : ${JSON.stringify(this.props)}`)
+
         const layoutMain = () => {
             if(this.props.url == '/view/form') {
                 return (<FormLayout/>);

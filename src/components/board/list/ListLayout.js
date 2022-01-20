@@ -35,7 +35,7 @@ class ListLayout extends Component {
 
                     {/* Card Content */}
                     <CardContent>
-                        <List quarterInfo={this.props.quarterInfo}/>    
+                        <List />    
                     </CardContent>
                 </Card>
             </React.Fragment>

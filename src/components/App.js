@@ -5,6 +5,7 @@ import LayoutMain from './layout/LayoutMain'
 import LayoutHeader from './layout/LayoutHeader'
 import NotFound from './error/NotFound'
 
+import Store, { NameContext } from './context/Store'
 
 class App extends Component {
   constructor(props) {
@@ -27,7 +28,7 @@ class App extends Component {
             menuList : data.menuList,
             quarterInfo : data.quarterInfo,
             userInfo : {
-              name : `${data.name.familyName} ${data.name.givenName}`,
+              name : data.name,
               email : data.email
             }
           })
@@ -36,24 +37,25 @@ class App extends Component {
   }
 
   render() {
-    
-                   
     return (
       <React.Fragment>
-        
+        <Store >
+          <NameContext.Provider value={{ userInfo : this.state.userInfo, quarterInfo : this.state.quarterInfo, menuList : this.state.menuList }}>
           <Switch>
             {this.state.menuList.map((menu, index) => {
               return (
                 <Route exact path={menu.MENU_URL} component = {() => 
-                  <LayoutMain url={menu.MENU_URL} menuList = {this.state.menuList}  quarterInfo={this.state.quarterInfo} userInfo={this.state.userInfo} >
-                    <LayoutHeader menus={this.state.menuList} quarterInfo={this.state.quarterInfo} userInfo={this.state.userInfo}/>
+                  <LayoutMain url={menu.MENU_URL}  >
+                    <LayoutHeader />
                   </LayoutMain>
                   }/>)
                 }
               )}
-              <Route component = {() => <NotFound />}   />
+              <Route component = {() => <NotFound />} path="/view/notFound"  />
             </Switch>
-          </React.Fragment>
+            </NameContext.Provider>
+         </Store>
+      </React.Fragment>
     );    
   }
 }

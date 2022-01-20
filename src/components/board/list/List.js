@@ -12,36 +12,33 @@ import MenuItem from '@mui/material/MenuItem';
 import moment from 'moment';
 import PraiseCard from './PraiseCard';
 import {useLocation} from "react-router";
+import Store, { NameContext } from '../../context/Store';
 
 export default function List(props) {
   // 작성 중일 때 : quarter : thisQuarter, cards=1(내가쓴카드)
   // 추천 중일 때 : quarter : thisQuarter,  cards=안읽은 카드
   // 마감 : quarter : cardes : 안읽은 카드(5) 혹은 전체 카드
   const location = useLocation();
-  const [searchForm, setSearchForm] = React.useState({ quarter : props.quarterInfo.QUARTER, cards : props.quarterInfo.ISCLOSED == 'N' ? '1' : '5' });
-  
-  const [reload, setReload] = React.useState(false);
+  const { userInfo, quarterInfo } = React.useContext(NameContext);
+
+  const [searchForm, setSearchForm] = React.useState({ quarter : quarterInfo.QUARTER, cards : quarterInfo.ISCLOSED == 'N' ? '1' : '5' });
   const [result, setResult] = React.useState({error : true, message : '', open : false});
 
   const [posts, setPosts] = React.useState([]);
   const [quarterList, setQuarterList] = React.useState([]);
-  const [isRecClosed, setIsRecClosed] = React.useState(false);
   
   // 추천 카드 CARD_CHECK
-  const [check, setChecks] = React.useState(0);
   
   React.useEffect(() => {
-    console.log(JSON.stringify(props))
     const fetchPosts = async () => {
-      if(searchForm.quarter == props.quarterInfo.QUARTER && props.quarterInfo.ISCLOSED == 'N' && searchForm.cards != '1') {
+      if(searchForm.quarter == quarterInfo.QUARTER && quarterInfo.ISCLOSED == 'N' && searchForm.cards != '1') {
         setResult({ ...result, open : true, error :true, message : '작성 마감이 되면 해당 분기 카드를 조회할 수 있습니다.' , url : '' })
-        setSearchForm({ ...searchForm, cards: '1', quarter : props.quarterInfo.QUARTER });
+        setSearchForm({ ...searchForm, cards: '1', quarter : quarterInfo.QUARTER });
         return false;
       }
 
       axios.get('/api/getCardsIWriteQuery', {params: searchForm})
       .then(async ({data}) => {
-        setChecks(false)
         setPosts(data[0])
       });
     }
@@ -53,16 +50,9 @@ export default function List(props) {
       });
     };
 
-    const fetchIsRecClose = async () => {
-      axios.get('/api/getIsClosedQuery')
-      .then(({data}) => {
-        setIsRecClosed(data[0][0].isRecClosed);
-      });
-    }
-
     fetchQuarter();
     fetchPosts();
- }, [searchForm, check, reload]);
+ }, [searchForm]);
 
 
  const handleChange = (e) => {
@@ -71,9 +61,6 @@ export default function List(props) {
  }
 
  const handleClose = () => { setResult({  ...result,  open : false }) }
- const handleReload = () => {
-   setReload(!reload)
- } 
 
  return (
   <React.Fragment>
@@ -114,12 +101,12 @@ export default function List(props) {
             sender : el.SENDER, 
             content : el.CONTENT,
             evaluation : el.EVALUATION, 
-            sendDt : moment(el.SEND_DT).format('YYYY-MM-DD') + " " + el.SEND_TM 
+            sendDt : moment(el.SEND_DT).format('YYYY-MM-DD') + " " + el.SEND_TM,
+            readDt : el.READ_DT === undefined ? '' : moment(el.READ_DT).format('YYYY-MM-DD') + " " + el.READ_TM
           }
-          
-          const isRecPeriodYn = (el.ISRECCLOSED == 'N' && el.ISCLOSED == 'Y');
-          return  ( <PraiseCard card = {praiseCard} searchForm={searchForm} isRecPeriodYn={isRecPeriodYn} /> )  } ) : null}
-              </Grid>
+          const isRecPeriodYn = (quarterInfo.ISRECCLOSED == 'N' && quarterInfo.ISCLOSED == 'Y' && el.SENDER != userInfo.email && quarterInfo.QUARTER == searchForm.quarter );
+          return  ( <PraiseCard card = {praiseCard} searchForm={searchForm} isClosed = {quarterInfo.ISCLOSED} isRecPeriodYn={isRecPeriodYn} /> )  } ) : null}
+        </Grid>
       </CardContent> 
     </React.Fragment>
   );

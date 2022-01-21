@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import FormLayout from '../board/form/FormLayout';
-import ListLayout from '../board/list/ListLayout';
+import FormLayout from '../card/form/FormLayout';
+import ListLayout from '../card/list/ListLayout';
+import GradeListLayout from '../card/gradelist/GradeListLayout';
 
 import {GradeList, Status, Setting } from '../../index.js';
 
@@ -18,9 +19,9 @@ class LayoutMain extends Component {
             if(this.props.url == '/view/form') {
                 return (<FormLayout/>);
             } else if(this.props.url == '/view/list') {
-                return (<ListLayout quarterInfo={this.props.quarterInfo}/>);
+                return (<ListLayout/>);
             } else if(this.props.url =='/view/gradelist'){
-                return (<GradeList/>)
+                return (<GradeListLayout/>)
             }else if(this.props.url == '/view/status') {
                 return (<Status/>)
             } else if(this.props.url=='/view/setting') {

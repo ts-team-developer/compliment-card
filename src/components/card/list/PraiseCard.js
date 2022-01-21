@@ -107,7 +107,9 @@ export default function PraiseCard(props) {
                     </CardContent>
 
                     <CardContent>
-                        <Typography variant="body2" color="text.secondary" sx={{fontFamily : 'NanumGothic'}}>{props.card.content}</Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{fontFamily : 'NanumGothic'}}> 
+                            {props.card.content.split('\n').map((line) => { return (<p>{line}</p>)  })  } 
+                        </Typography>
                     </CardContent>
 
                     <CardActions disableSpacing>

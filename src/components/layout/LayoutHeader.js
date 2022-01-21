@@ -8,8 +8,7 @@ import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 import Store, { NameContext } from '../context/Store';
 
-
-export default function LayoutHeader(props) {
+export default function LayoutHeader() {
   const { userInfo, quarterInfo, menuList } = React.useContext(NameContext);
 
   return (
@@ -31,7 +30,7 @@ export default function LayoutHeader(props) {
             <Typography variant="body1" style={{fontFamily : 'NanumGothic'}}  gutterBottom>
                 {userInfo.name}
             </Typography>
-            <Typography variant="caption" gutterBottom style={{fontFamily : 'NanumGothic'}}>
+            <Typography variant="caption" gutterBottom style={{fontFamily : 'NanumGothic', lineHeight: '25px'}}>
               [{quarterInfo.ISCLOSED == 'N' ? `${quarterInfo.QUARTER} 카드 작성기간` : quarterInfo.ISRECCLOSED == 'N' ? `${quarterInfo.QUARTER} 추천 진행중` : '종료'}] 
             </Typography>
           </Stack>

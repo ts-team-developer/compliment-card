@@ -44,28 +44,28 @@ router.get('/getCardsIWriteQuery', async(req, res, next) => {
         else quarterSql = quarter;
 
         if(cards == 5) {
-            sql += ` SELECT SEQ, QUARTER, SENDER, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER ) AS RECEIVER, CONTENT, SEND_DT, SEND_TM  `
+            sql += ` SELECT SEQ, QUARTER, SENDER, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER ) AS RECEIVER, REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SEND_DT, SEND_TM  `
             sql += ` FROM praise_card P `
             sql += ` WHERE  sender NOT IN ('${req.user.email}', '${req.user.name}')  and NOT EXISTS (SELECT 'x' FROM card_check C WHERE C.seq = P.seq AND NAME_KOR IN ('${req.user.email}' ,'${req.user.name}')) `
             sql += `        AND QUARTER = '${quarterSql}'  `
         } else if(cards == 4) {
-            sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER, c.READ_DT, c.READ_TM, (SELECT NAME_KOR FROM EMP WHERE EMAIL = p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, p.CONTENT, SUM(c.evaluation) AS EVALUATION, SEND_DT, SEND_TM `
+            sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER, c.READ_DT, c.READ_TM, (SELECT NAME_KOR FROM EMP WHERE EMAIL = p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, REPLACE(p.CONTENT, CHAR(10), '\n') AS CONTENT, SUM(c.evaluation) AS EVALUATION, SEND_DT, SEND_TM `
             sql += ` FROM  praise_card p, card_check c `
             sql += ` WHERE p.seq=c.seq `
             sql += (score > 0) ? ` AND c.evaluation = ${score}` : ` AND c.evaluation > 0 `;
             sql += ` AND p.quarter=  '${quarterSql}' `
             sql += ` GROUP BY c.seq ORDER BY evaluation DESC `
         } else if(cards == 3) {
-            sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER,  (SELECT NAME_KOR FROM EMP WHERE EMAIL= p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, p.CONTENT, c.READ_DT, c.READ_TM, c.EVALUATION, SEND_DT, SEND_TM  `;
+            sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER,  (SELECT NAME_KOR FROM EMP WHERE EMAIL= p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, REPLACE(P.CONTENT, CHAR(10), '\n') AS CONTENT, c.READ_DT, c.READ_TM, c.EVALUATION, SEND_DT, SEND_TM  `;
             sql += ` FROM praise_card p LEFT OUTER JOIN card_check c ON p.seq=c.seq AND c.name_kor IN ('${req.user.email}', '${req.user.name}') `;
             sql += ` WHERE p.quarter='${quarterSql}' `
             sql +=  (score > 0) ? ` AND c.evaluation = ${score}` : ``;
         } else if( cards == 2) {
-            sql += ` SELECT p.SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,SENDER, CONTENT , READ_DT, READ_TM  `
+            sql += ` SELECT p.SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,SENDER, REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT , READ_DT, READ_TM  `
             sql += ` FROM   praise_card p right join card_check c on p.seq = c.seq  `;
             sql += ` WHERE  RECEIVER IN ('${req.user.email}', '${req.user.name}') AND NAME_KOR IN ('${req.user.email}', '${req.user.name}') AND QUARTER ='${quarterSql}'  `;
         }  else if(cards == 1) {
-            sql += ` SELECT SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,CONTENT,SENDER, SEND_DT, SEND_TM FROM praise_card p WHERE SENDER IN ('${req.user.email}', '${req.user.name}') AND QUARTER ='${quarterSql}' `
+            sql += ` SELECT SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SENDER, SEND_DT, SEND_TM FROM praise_card p WHERE SENDER IN ('${req.user.email}', '${req.user.name}') AND QUARTER ='${quarterSql}' `
         }
 
         const data = await connection.query(sql);
@@ -104,7 +104,7 @@ router.get('/getIsClosedQuery', async(req, res, next) => {
 router.get('/getCardsDetailQuery', async(req, res, next) => {
     try{
         let connection = await pool.getConnection(async conn => conn)
-        let sql = ` SELECT A.SEQ, A.QUARTER, A.SENDER, A.RECEIVER, A.SEND_DT,A.SEND_TM, A.CONTENT `
+        let sql = ` SELECT A.SEQ, A.QUARTER, A.SENDER, A.RECEIVER, A.SEND_DT,A.SEND_TM, REPLACE(A. CONTENT, CHAR(10), '\n') AS CONTENT `
         sql += ` FROM praise_card A WHERE SEQ = ${req.query.seq}`
         const data = await connection.query(sql)
         connection.release();

@@ -13,7 +13,7 @@ import {useLocation} from "react-router";
 // 받는사람 LIST
 // 받는 사람 리스트 조회
 const employeeList= [];
-axios.get('/api/selectbody')
+axios.get('/api/emp/list')
   .then(({data}) => {
     data[0].forEach(element => {
     employeeList.push({label : element.name_kor, value : element.email})
@@ -28,7 +28,7 @@ export default function Form(props) {
   
   // 저장버튼 클릭 이벤트
   const handleOpen = async () => {
-      axios.post('/api/register', values).then( async res => {
+      axios.post('/api/card/save', values).then( async res => {
         setResult({ ...result, open : true, error : res.status != 200, message : res.data.message, url : res.status != 200 ? '' : '/view/list' })
       }).catch(async error => {
         setResult({ ...result, open : true, error :true, message : error.response.data.message , url : '' })
@@ -51,7 +51,7 @@ export default function Form(props) {
   }
 
   React.useEffect(() => {
-    axios.get('/api/getIsClosedQuery').then(({data}) => {
+    axios.get('/api/quarter/detail').then(({data}) => {
       if(data[0][0]) {
         if(data[0][0].isClosed == 'Y') {
           setResult({...result , 
@@ -66,7 +66,7 @@ export default function Form(props) {
     
     try{
       // 수정폼일 시 SEQ값으로 데이터를 조회한다.
-      axios.get('/api/getCardsDetailQuery', {params: { seq : location.state.seq }})
+      axios.get('/api/card/detail', {params: { seq : location.state.seq }})
       .then(({data}) => {
         setValues({ ...values, 
           seq : data[0][0].SEQ,

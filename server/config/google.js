@@ -29,7 +29,7 @@ module.exports = () => {
         {
           clientID      : "346544479744-khv0riu09o6pr3sm55hlh5i14fmeggmf.apps.googleusercontent.com",
           clientSecret  : "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",
-          callbackURL   : 'http://localhost:3001/auth/google/callback',
+          callbackURL   : 'http://127.0.0.1:3001/auth/google/callback',
           passReqToCallback   : true
         }, async function(request, accessToken, refreshToken, profile, done){
             try{
@@ -37,14 +37,16 @@ module.exports = () => {
                 // idaccesstoken vs accesstoken.
                 //////// 
                 //accesstoken. 인증 : 로그인하면 idaccesstoken 발급, accesstoken
+                console.log(` google.js : ${JSON.stringify(profile)}`)
                 let connection = await pool.getConnection(async conn => conn)
                 const data = await connection.query("SELECT WORK_STS, NAME_KOR FROM EMP WHERE EMAIL ='" + profile.emails[0].value + "'")
                 connection.release();
-                if(data[0][0].WORK_STS == "1") {
-                    return done(null, {'uid' : profile.id, 'name' : data[0][0].NAME_KOR , 'picture' : profile.photos[0].value, 'email' : profile.emails[0].value, 'token' : accessToken });
-                }else {
-                    return done('fail', null)
-                }
+                // if(data[0][0].WORK_STS == "1") {
+                  // return done(null, {'uid' : profile.id, 'name' : data[0][0].NAME_KOR , 'picture' : profile.photos[0].value, 'email' : profile.emails[0].value, 'token' : accessToken });
+                // }else {
+                //   return done('fail', null)
+                // }
+                return done(null, {'uid' : profile.id, 'name' : data[0][0].NAME_KOR , 'picture' : profile.photos[0].value, 'email' : profile.emails[0].value, 'token' : accessToken });
                 
             }catch(err) {
                 console.log(err)

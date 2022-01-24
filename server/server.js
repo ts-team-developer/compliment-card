@@ -6,7 +6,6 @@ const session = require('express-session');
 const cookieParser  = require('cookie-parser');
 const port = process.env.PORT || 3001;
 const passport = require('passport');
-const route = require('./routes/index');
 const path = require('path');
 const passportConfig = require('./config/passport')
 
@@ -15,29 +14,20 @@ app.use("/view",express.static(path.join(__dirname, '..', 'build')));
 app.use(cookieParser());
 
 app.get("/", function (req, res) {
+    console.log(`server.js router ==> '/' : ${req.user === undefiend}`)
     if(req.user === undefined) {
-        res.redirect('/auth/login/google')
+        res.redirect('/auth/login')
     } else {
         res.redirect('/view/list')
     }
 })
 
 app.get("/view", function (req, res) {
-    try{
-        if(req.user === undefined) {
-            res.redirect('/auth/login/google')
-        } else {
-            res.sendFile(path.join(__dirname, '../build/index.html'));
-        }
-    } catch(err){
-        res.redirect('/view/notFound')
-    }
-    
+    res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
 app.get("/view/*", function (req, res) {
-
-    res.sendFile(path.resolve(__dirname, '../build/index.html'));
+    res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
 app.use(cors({
@@ -46,8 +36,6 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
-
-
 
 app.use(session({ 
     secret:'MySecret', 
@@ -66,17 +54,14 @@ passportConfig()
 
 
 // router
-app.use('/api', route);
+app.use('/api', require('./routes'));
 app.use('/auth', require('./routes/login'));
-app.use('/menu', require('./routes/menu'));
 
 app.use(function(req, res, next) {
-    console.log('test')
     res.redirect("/view/notFound")
 });
 
 app.use(function(err, req, res, next) {
-    console.log('test')
     res.redirect("/view/notFound")
 });
 

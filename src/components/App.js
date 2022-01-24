@@ -4,7 +4,6 @@ import axios from 'axios';
 import LayoutMain from './layout/LayoutMain'
 import LayoutHeader from './layout/LayoutHeader'
 import ErrorLayout from './error/ErrorLayout'
-import NotFound from './error/NotFound'
 import Store, { NameContext } from './context/Store'
 
 class App extends Component {
@@ -23,7 +22,7 @@ class App extends Component {
 
     axios.get('/auth/isAuthenticated').then(async ({data}) => {
        if(data == null) {
-         window.location.href= '/auth/login/google'; 
+         window.location.href= '/auth/login'; 
        } else {
           this.setState({
             menuList : data.menuList,
@@ -36,8 +35,6 @@ class App extends Component {
        }
     });
   }
-  
-
 
   render() {
     return (

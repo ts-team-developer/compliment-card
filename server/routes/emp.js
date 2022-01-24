@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const pool = require('../config/pool')
 
 pool.getConnection((err, connection) => {
@@ -17,18 +18,16 @@ pool.getConnection((err, connection) => {
         }
       }
       if (connection) return connection.release();
-})
+});
 
-router.get('/getMenuList', async (req, res, next) => {
+router.get('/list', async(req, res, next) => {
     try{
         let connection = await pool.getConnection(async conn => conn)
-        const data = await connection.query(`SELECT * FROM MENU A INNER JOIN ROLEMENU B ON A.MENU_ID = B.MENU_ID INNER JOIN EMP C ON B.ROLE_CD = C.AUTH WHERE C.EMAIL = 'jang314@mnwise.com' ORDER BY ORDER_SQ `)
+        const data = await connection.query('select * from emp where end_date is null and work_sts = 1 ')
         connection.release();
-        res.json(data[0][0])        
-    }catch(err) {
-        console.log(err)
-      res.json(null)
+        return res.json(data)
+    } catch (err) {
+        return res.status(500).json(err)
     }
-  })
-
+});
 module.exports = router;

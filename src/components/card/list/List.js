@@ -37,14 +37,14 @@ export default function List(props) {
         return false;
       }
 
-      axios.get('/api/getCardsIWriteQuery', {params: searchForm})
+      axios.get('/api/card/list', {params: searchForm})
       .then(async ({data}) => {
         setPosts(data[0])
       });
     }
 
     const fetchQuarter = async () => {
-      axios.get('/api/getQuarterQuery')
+      axios.get('/api/quarter/list')
       .then(({data}) => {
         setQuarterList(data[0])
       });

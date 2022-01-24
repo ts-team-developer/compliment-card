@@ -45,7 +45,7 @@ export default function PraiseCard(props) {
     }
 
     const handleCallback = () => {
-        axios.post('/api/deleteCard', {'seq' : props.card.seq}).then( async res => {
+        axios.post('/api/card/delete', {'seq' : props.card.seq}).then( async res => {
             setResult({  
                 ...result,  
                 open : false, 
@@ -83,7 +83,7 @@ export default function PraiseCard(props) {
                 <ConfirmPopup open={result.open}  msg = '정말로 삭제하시겠습니까?'  handleClose={handleClose} handleCallback={handleCallback} />
                 <AlimPopup open={result.callback.open} handleClose={handleClose} msg={result.callback.message} error={result.callback.error}/>
 
-                <Card color="info"  severity="success" sx={{backgroudColor : '#dff0d8'}}>    
+                <Card color="info"  variant="outlined" sx={{backgroudColor : '#dff0d8'}}>    
                     <CardContent sx={{backgroudColor : '#dff0d8'}}>
                         <Typography variant="subtitle1"  sx={{fontFamily : 'NanumGothic', fontWeight : 'bold', float : 'left'}}>
                             {props.card.receiver} 

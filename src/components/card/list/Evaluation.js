@@ -21,7 +21,7 @@ class Evaluation extends Component{
 
 
     handleChange = (e) => {
-        axios.post('/api/doCardCheckTable',{'seq' : this.props.seq, 'evaluation' : e.target.value}).then( async res => {
+        axios.post('/api/evaluation/save',{'seq' : this.props.seq, 'evaluation' : e.target.value}).then( async res => {
             this.setState({
                 open: true,
                 error : res.status != 200,

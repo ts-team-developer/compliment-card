@@ -1,11 +1,9 @@
 import * as React from 'react';
 import axios from 'axios';
-import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import { styled, alpha } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 
-import { red } from '@mui/material/colors';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Grid from '@mui/material/Grid';
 import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
@@ -58,13 +56,13 @@ export default function FixedContainer() {
 
   React.useEffect(() => {
     const fetchPosts = async () => {
-      axios.get('/api/getBestCardsQuery')
+      axios.get('/api/card/bestcard')
       .then(({data}) => {
         setPosts(data[0])
       });
     }
     const fetchQuarter = async () => {
-      axios.get('/api/getQuarterQuery')
+      axios.get('/api/quarter/list')
       .then(({data}) => {
          setQuarterList(data[0])
       });

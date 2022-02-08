@@ -1,6 +1,7 @@
 const passport = require('passport');
 const google = require('./google');
-const pool = require('../config/pool')
+const pool = require('../config/pool');
+const axios = require('axios');
 
 pool.getConnection((err, connection) => {
     if (err) {
@@ -22,24 +23,25 @@ pool.getConnection((err, connection) => {
 
 module.exports = () => {
   passport.serializeUser(function(user, done) {
-    console.log(`serializeUser`)
+    console.log(`serializeUser` )
     done(null, user);
   });
   
   // 매개변수 user는 req.session.passport에 저장된 값
   passport.deserializeUser(async function(user, done) {
-    console.log(``)
+    console.log(`deserializeUser `)
     let connection = await pool.getConnection(async conn => conn)
     const data = await connection.query("SELECT QUARTER, ISCLOSED, ISRECCLOSED FROM CLOSED  ORDER BY QUARTER DESC LIMIT 0, 1 ");
-    const menu = await connection.query(`SELECT * FROM MENU A INNER JOIN ROLEMENU B ON A.MENU_ID = B.MENU_ID INNER JOIN EMP C ON B.ROLE_CD = C.AUTH WHERE C.EMAIL = '${user.email}' ORDER BY ORDER_SQ `)
+    
     connection.release();
-    user.menuList = menu[0]
+    
     // 오픈된 분기 정보 가져오기
     if(data[0][0] == null) user.quarter = '';
     else user.quarterInfo =data[0][0];
-    console.log(`deserializeUser `)
-    done(null, user);
+    return done(null, user);
+  
   });
   
+
   google();
 }

@@ -1,46 +1,130 @@
 import React, {Component} from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import FormLayout from '../board/form/FormLayout';
-import ListLayout from '../board/list/ListLayout';
+import FormLayout from '../card/form/FormLayout';
+import ListLayout from '../card/list/ListLayout';
+import GradeListLayout from '../card/gradelist/GradeListLayout';
+import {Status, Setting } from '../../index.js';
+import AlimPopup from '../modal/AlimPopup';
+import ConfirmPopup from '../modal/ConfirmPopup';
 
-import {GradeList, Status, Setting } from '../../index.js';
+import { connect } from 'react-redux';
+
+import axios from 'axios';
+import ErrorLayout from '../error/ErrorLayout';
+import { refreshRequest, logoutRequest } from '../../redux/actions/authentication'; 
 
 class LayoutMain extends Component {
     constructor(props) {
-        super(props)
+        super(props);
+        this.state = {
+            open :false,
+            message : '',
+            result : {
+                open :false,
+                error : false,
+                message : ''
+            }
+        }
+
+        this.handleClose = this.handleClose.bind(this)
+        this.handleCallback = this.handleCallback.bind(this);
+
+        if(this.props.loginStatus.status.currentUser != null) {
+            if(this.props.loginStatus.login.status === "SUCCESS") {
+                axios.get('/auth/isAuthenticated', {params: {'token' : this.props.loginStatus.status.currentUser.ACCESS_TOKEN, 'isRefresh' : this.props.refresh}})
+                .then(async (response) => {
+                    if(!this.props.login.refresh) {
+                        if(response.data.result == true && response.data.message != null) {
+                            this.setState({
+                                open : true,
+                                message : response.data.message,
+                                error : false
+                            })
+                        }
+                    } 
+                
+                    // 로그아웃 처리하기
+                    if(response.data.result == false) {
+                        this.props.onLogout();
+                    }
+                }).catch((err) => {
+                    this.setState({
+                        open : true,
+                        message : `${err}`,
+                        error : false
+                    })
+                });
+            }
+        } 
+    }
+
+    // 취소 버튼을 누르면 리덕스 를 호출하려
+    handleClose = () => {
+        // refresh가 true이면, 로그인 연장 안하고, 결국 로그아웃 창이 떴을거임..
+        if(this.props.login.refresh) {
+            // 로그아웃 처리하기 (REDUX)
+            this.props.onLogout();
+        } else {
+            // refresh가 false이면 로그인 연장여부 물어본 상태이고, 취소 상태임.
+            this.props.refreshRequest(false);
+        }
+    }
+
+    handleCallback = () => {
+        this.props.refreshRequest(true);
     }
 
     render() {
-        console.log(`layoutMain : ${JSON.stringify(this.props)}`)
         const layoutMain = () => {
-            if(this.props.url == '/view/form') {
-                return (<FormLayout/>);
-            } else if(this.props.url == '/view/list') {
-                return (<ListLayout quarterInfo={this.props.quarterInfo}/>);
-            } else if(this.props.url =='/view/gradelist'){
-                return (<GradeList/>)
-            }else if(this.props.url == '/view/status') {
-                return (<Status/>)
-            } else if(this.props.url=='/view/setting') {
-                return (<Setting/>)
-            } 
+            if(this.props.loginStatus.login.status==="SUCCESS") {
+                if(this.props.url == '/view/form') {
+                    return (<FormLayout/>);
+                } else if(this.props.url == '/view/list') {
+                    return (<ListLayout/>);
+                } else if(this.props.url =='/view/gradelist'){
+                    return (<GradeListLayout/>)
+                }else if(this.props.url == '/view/status') {
+                    return (<Status/>)
+                } else if(this.props.url=='/view/setting') {
+                    return (<Setting/>)
+                }
+            } else {
+                return (<ErrorLayout error="auth"/>);
+            }
         }
 
         return (
             <React.Fragment>
-                {this.props.children}
-                <Container fixed >
-                    <Box sx={{ bgcolor: 'none', height: '100vh' }} sx={{ mt: 10 }} >
-                        <Box component="form" noValidate  autoComplete="off"  > 
-                            {layoutMain()}
-                        </Box>
+            <ConfirmPopup open={this.state.open}  msg = {this.state.message}  handleClose={this.handleClose} handleCallback={this.handleCallback} />
+            <AlimPopup open={this.state.result.open} handleClose={this.handleClose} msg={this.state.result.message} error={this.state.result.error}/>
+            {this.props.loginStatus.login.status === "SUCCESS" ? this.props.children : null}
+            
+            <Container fixed >
+                <Box sx={{ bgcolor: 'none', height: '100vh' }} sx={{ mt: 10 }} >
+                    <Box component="form" noValidate  autoComplete="off"  > 
+                        {layoutMain()} 
                     </Box>
-                </Container>
-                
-            </React.Fragment>
+                </Box>
+            </Container>
+        </React.Fragment>
         );
     }
 }
-
-export default LayoutMain;
+const mapStateToProps = (state) => {
+   return {
+     status : state.authentication.status,
+     login : state.authentication.login
+   }
+}
+const mapDispatchToProps = (dispatch) => {
+    return {
+      refreshRequest : (request) => {
+        return dispatch(refreshRequest(request));
+      },
+      logoutRequest : () => {
+        return dispatch(logoutRequest());
+      }
+    }
+  }
+export default connect(mapStateToProps, mapDispatchToProps)(LayoutMain);

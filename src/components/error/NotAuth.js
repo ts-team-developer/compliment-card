@@ -14,7 +14,7 @@ class NotFound extends Component {
 
     componentDidMount() {
         setTimeout(() => {
-        }, 800)
+        }, 3000)
     }
     render() {
         return (
@@ -25,18 +25,17 @@ class NotFound extends Component {
                             <NotInterestedIcon color="error" fontSize="120px"  />
                         </Typography>
                         <Typography variant="h1 " component="h1" sx={{fontFamily:'NanumSquare', textAlign:'center',fontSize : '70px'}}>
-                            404 Not Found
+                            접근 불가
                         </Typography>
                     </CardMedia>
                                     
                     {/* Card Content */}
                     <CardContent>
                         <Typography variant="h4 " component="h4" sx={{fontFamily:'NanumSquare', textAlign:'center', mb: '30px', fontSize : '30px' }}>
-                            페이지를 찾을 수 없습니다.
+                            접근가능 페이지가 아닙니다.
                         </Typography>
     
-                        <Typography variant="h4 " component="h4" sx={{fontFamily:'NanumSquare', textAlign:'center', mb: '30px', fontSize : '15px', cursor:'pointer', color : '#eee'}}>
-                            처음 화면으로 돌아갑니다.
+                        <Typography variant="h4 " component="h4" sx={{fontFamily:'NanumSquare', textAlign:'center', mb: '30px', fontSize : '15px', cursor:'pointer', color : '#000'}}>
                         </Typography>
                     </CardContent>
                 </Card>

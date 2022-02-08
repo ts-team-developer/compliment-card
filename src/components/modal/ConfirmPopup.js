@@ -23,7 +23,7 @@ class Alim extends Component {
     render () {
         return (
             <div>
-                <Modal open={this.props.open} onClose={this.props.handleClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+                <Modal open={this.props.open}  aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
                     <Alert severity='warning'  sx={style}  onClose={this.props.handleClose}>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
                             <AlertTitle sx={{fontFamily : 'NanumGothic'}}>Warning</AlertTitle>

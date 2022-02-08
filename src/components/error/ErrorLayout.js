@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import NotFound from './NotFound';
+import NotAuth from './NotAuth';
 
 
 class ErrorLayout extends Component {
@@ -17,6 +18,8 @@ class ErrorLayout extends Component {
         const errorPage = () => {
             if(this.props.error == '404') {
                 return (<NotFound/>);
+            } else if(this.props.error == 'auth'){
+                return (<NotAuth/>);
             } 
         }
             return (

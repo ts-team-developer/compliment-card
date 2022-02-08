@@ -20,6 +20,18 @@ pool.getConnection((err, connection) => {
       if (connection) return connection.release();
 });
 
+// 가장 최근 분기 조회
+router.get('/recently', async(req, res, next) => {
+    try{
+        let connection = await pool.getConnection(async conn => conn)
+        const data = await connection.query("SELECT QUARTER, ISCLOSED, ISRECCLOSED FROM CLOSED  ORDER BY QUARTER DESC LIMIT 0, 1  ")
+        connection.release();
+        return res.json(data)
+    }catch (err){
+        return res.status(500).json(err)
+    }
+});
+
 
 // 분기 전체 조회
 router.get('/list', async(req, res, next) => {
@@ -29,16 +41,18 @@ router.get('/list', async(req, res, next) => {
         connection.release();
         return res.json(data)
     }catch (err){
+        console.log(`quarter list : ${err}`)
         return res.status(500).json(err)
     }
 });
 
 router.get('/detail', async(req, res, next) => {
     try{
-        let connection = await pool.getConnection(async conn => conn)
-        const data = await connection.query(`SELECT * FROM CLOSED WHERE QUARTER = '${req.user.quarterInfo.QUARTER}'  `)
-        connection.release();
-        return res.json(data)
+        let connection = await pool.getConnection(async conn => conn);
+
+            const data = await connection.query(`SELECT * FROM CLOSED WHERE QUARTER = '${req.user.quarterInfo.QUARTER}'  `)
+            connection.release();
+            return res.json(data)
     }catch (err){
         console.log(err)
         return res.status(500).json(err)

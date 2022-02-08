@@ -4,7 +4,6 @@ import axios from 'axios';
 import Rating from '@mui/material/Rating';
 import AlimPopup from '../../modal/AlimPopup';
 
-
 class Evaluation extends Component{
     constructor (props) {
         super(props);
@@ -58,5 +57,6 @@ class Evaluation extends Component{
         )
     }
 }
+
 
 export default Evaluation;

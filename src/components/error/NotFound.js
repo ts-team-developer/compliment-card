@@ -14,7 +14,6 @@ class NotFound extends Component {
 
     componentDidMount() {
         setTimeout(() => {
-            console.log(`test`);
         }, 800)
     }
     render() {

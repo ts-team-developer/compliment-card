@@ -23,10 +23,6 @@ pool.getConnection((err, connection) => {
 
 router.get('/list', async(req, res, next) => {
     try{
-        if(req.user === undefined) {
-            console.log('test')
-            return res.status(403).json()
-        } else {
             // cards : 5 - 안 읽은 카드, 4 - 추천카드(o), 3 - 전체카드(o) , 2 - 받은 카드 1-  내가쓴카드
             const {cards, score, quarter} = req.query;
             let connection = await pool.getConnection(async conn => conn);
@@ -39,7 +35,7 @@ router.get('/list', async(req, res, next) => {
             if(cards == 5) {
                 sql += ` SELECT SEQ, QUARTER, SENDER, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER ) AS RECEIVER, REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SEND_DT, SEND_TM  `
                 sql += ` FROM praise_card P `
-                sql += ` WHERE  sender NOT IN ('${req.user.email}', '${req.user.name}')  and NOT EXISTS (SELECT 'x' FROM card_check C WHERE C.seq = P.seq AND NAME_KOR IN ('${req.user.email}' ,'${req.user.name}')) `
+                sql += ` WHERE  sender NOT IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}')  and NOT EXISTS (SELECT 'x' FROM card_check C WHERE C.seq = P.seq AND NAME_KOR IN ('${req.user.loginUser.EMAIL}' ,'${req.user.loginUser.NAME_KOR}')) `
                 sql += `        AND QUARTER = '${quarterSql}'  `
             } else if(cards == 4) {
                 sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER, c.READ_DT, c.READ_TM, (SELECT NAME_KOR FROM EMP WHERE EMAIL = p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, REPLACE(p.CONTENT, CHAR(10), '\n') AS CONTENT, SUM(c.evaluation) AS EVALUATION, SEND_DT, SEND_TM `
@@ -50,22 +46,21 @@ router.get('/list', async(req, res, next) => {
                 sql += ` GROUP BY c.seq ORDER BY evaluation DESC `
             } else if(cards == 3) {
                 sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER,  (SELECT NAME_KOR FROM EMP WHERE EMAIL= p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, REPLACE(P.CONTENT, CHAR(10), '\n') AS CONTENT, c.READ_DT, c.READ_TM, c.EVALUATION, SEND_DT, SEND_TM  `;
-                sql += ` FROM praise_card p LEFT OUTER JOIN card_check c ON p.seq=c.seq AND c.name_kor IN ('${req.user.email}', '${req.user.name}') `;
+                sql += ` FROM praise_card p LEFT OUTER JOIN card_check c ON p.seq=c.seq AND c.name_kor IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') `;
                 sql += ` WHERE p.quarter='${quarterSql}' `
                 sql +=  (score > 0) ? ` AND c.evaluation = ${score}` : ``;
             } else if( cards == 2) {
                 sql += ` SELECT p.SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,SENDER, REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT , READ_DT, READ_TM  `
                 sql += ` FROM   praise_card p right join card_check c on p.seq = c.seq  `;
-                sql += ` WHERE  RECEIVER IN ('${req.user.email}', '${req.user.name}') AND NAME_KOR IN ('${req.user.email}', '${req.user.name}') AND QUARTER ='${quarterSql}'  `;
+                sql += ` WHERE  RECEIVER IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') AND NAME_KOR IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') AND QUARTER ='${quarterSql}'  `;
             }  else if(cards == 1) {
-                sql += ` SELECT SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SENDER, SEND_DT, SEND_TM FROM praise_card p WHERE SENDER IN ('${req.user.email}', '${req.user.name}') AND QUARTER ='${quarterSql}' `
+                sql += ` SELECT SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SENDER, SEND_DT, SEND_TM FROM praise_card p WHERE SENDER IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') AND QUARTER ='${quarterSql}' `
             }
 
             const data = await connection.query(sql);
             connection.release();
 
             return res.json(data)
-        }
     }catch (err){
         console.log(err)
         return res.status(500).send()
@@ -75,7 +70,7 @@ router.get('/list', async(req, res, next) => {
 router.get('/getEvaluationQuery', async(req, res, next) => {
     try{
         let connection = await pool.getConnection(async conn => conn)
-        const data = await connection.query(` SELECT SEQ, EVALUATION FROM card_check WHERE SEQ = ${seq} AND NAME_KOR = '${req.user.email}'`);
+        const data = await connection.query(` SELECT SEQ, EVALUATION FROM card_check WHERE SEQ = ${seq} AND NAME_KOR = '${req.user.loginUser.EMAIL}'`);
         connection.release();
         return res.json(data);
     }catch(err) {
@@ -107,21 +102,21 @@ router.post('/save', async(req, res, next) => {
 
     let result = ((seq == 0) ? true : (receiver != oriReceiver));
     // 받은사람 중복확인
-    const totalCnt = await connection.query(`SELECT COUNT(*) AS COUNT FROM praise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.email}' `);
+    const totalCnt = await connection.query(`SELECT COUNT(*) AS COUNT FROM praise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}' `);
     
-    const sendQry = `SELECT COUNT(*) AS COUNT FROM praise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.email}' AND RECEIVER = '${receiver}'`
+    const sendQry = `SELECT COUNT(*) AS COUNT FROM praise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}' AND RECEIVER = '${receiver}'`
     const sendCnt =  await connection.query( sendQry );
     const resultCard = await connection.query(` SELECT COUNT(*) AS COUNT FROM EMP WHERE WORK_STS = 1 AND EMAIL = '${receiver}'`);
 
     let preSql = `SELECT COUNT(*) AS COUNT FROM praise_card A LEFT JOIN EMP B ON A.RECEIVER = B.EMAIL  `;
     preSql += ` LEFT JOIN EMP C ON A.SENDER = C.EMAIL  AND B.WORK_STS = 1 `
-    preSql += ` WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.email}' AND B.TEAM != C.TEAM `
+    preSql += ` WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}' AND B.TEAM != C.TEAM `
 
     const preCard = await connection.query(preSql);
-    const afterCard = await connection.query( ` SELECT COUNT(*) AS COUNT FROM EMP WHERE TEAM NOT IN ( SELECT TEAM FROM EMP WHERE EMAIL = '${req.user.email}' ) AND EMAIL = '${receiver}'`);
+    const afterCard = await connection.query( ` SELECT COUNT(*) AS COUNT FROM EMP WHERE TEAM NOT IN ( SELECT TEAM FROM EMP WHERE EMAIL = '${req.user.loginUser.EMAIL}' ) AND EMAIL = '${receiver}'`);
     
     try{
-        if(req.user === undefiend) {
+        if(req.user === undefined) {
             res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
             return ;
         } else if (req.user.quarterInfo.ISCLOSED != 'N') {
@@ -135,7 +130,7 @@ router.post('/save', async(req, res, next) => {
             res.status(400).send({message:" 칭찬 받을 사람을 선택해주세요. "})
             connection.release();
             return ;
-        } else if(receiver == req.user.email) {
+        } else if(receiver == req.user.loginUser.EMAIL) {
             res.status(400).send({message:" 본인은 칭찬할 수 없습니다. "})
             connection.release();
             return ;
@@ -160,10 +155,10 @@ router.post('/save', async(req, res, next) => {
             let sql =""
             if(seq == 0) {
                 sql += `INSERT INTO praise_card (QUARTER, RECEIVER, SENDER, SEND_DT, SEND_TM, CONTENT)   `;
-                sql += `  VALUES ('${req.user.quarterInfo.QUARTER}', '${receiver}', '${req.user.email}', DATE_FORMAT(NOW(), '%Y-%m-%d'), DATE_FORMAT(NOW(), '%H:%i:%s'), '${content}')`;
+                sql += `  VALUES ('${req.user.quarterInfo.QUARTER}', '${receiver}', '${req.user.loginUser.EMAIL}', DATE_FORMAT(NOW(), '%Y-%m-%d'), DATE_FORMAT(NOW(), '%H:%i:%s'), '${content}')`;
             } else {
                 sql += ` UPDATE praise_card SET RECEIVER = '${receiver}' , SEND_DT = DATE_FORMAT(NOW(), '%Y-%m-%d'), SEND_TM=DATE_FORMAT(NOW(), '%H:%i:%s'), CONTENT='${content}'`;
-                sql += `  WHERE SEQ =  ${seq} AND SENDER = '${req.user.email}' `;
+                sql += `  WHERE SEQ =  ${seq} AND SENDER = '${req.user.loginUser.EMAIL}' `;
             }
                 
             const data = await connection.query(sql)
@@ -216,7 +211,7 @@ router.post('/delete', async(req, res, next) => {
         let connection = await pool.getConnection(async conn => conn)
         let sql = ` SELECT COUNT(*) AS COUNT FROM praise_card A LEFT JOIN EMP B ON A.RECEIVER = B.EMAIL `
         sql += `LEFT JOIN EMP C ON A.SENDER = C.EMAIL  AND B.WORK_STS = 1 `
-        sql += ` WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.email}'  AND B.TEAM != C.TEAM and SEQ != ${req.body.seq}`;
+        sql += ` WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}'  AND B.TEAM != C.TEAM and SEQ != ${req.body.seq}`;
 
         let selectSenderSql = `SELECT SENDER FROM praise_card WHERE SEQ = '${req.body.seq}' `;
         const data = await connection.query(sql)
@@ -231,7 +226,7 @@ router.post('/delete', async(req, res, next) => {
             res.status(400).send({message:"타 팀 먼저 칭찬 후 삭제해주세요 "})
             connection.release();
             return ;
-        } else if (selectSender[0][0].SENDER != req.user.email) {
+        } else if (selectSender[0][0].SENDER != req.user.loginUser.EMAIL) {
             res.status(400).send({message:"본인이 작성한 카드만 삭제할 수 있습니다. "})
             connection.release();
             return ;

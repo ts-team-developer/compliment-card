@@ -14,14 +14,14 @@ import AlimPopup from '../../modal/AlimPopup';
 import Evaluation from './Evaluation'
 import axios from 'axios';
 import Chip from '@mui/material/Chip';
+import { useSelector } from 'react-redux';
 
-import Store, { NameContext } from '../../context/Store';
 
 export default function PraiseCard(props) {
     const history = useHistory();
+    const info = useSelector(state => state.authentication.status);
+    
     const [result, setResult] = React.useState({ url : '/api/delete', seq : 0, message : '정말로 삭제하시겠습니까?', open : false, callback: {open : false, messge : '', error : false} });
-    const { userInfo, quarterInfo } = React.useContext(NameContext);
-
     const handleClick = (e) => {
         const {name, value} = {name : e.currentTarget.name, value : e.currentTarget.getAttribute('value')};
         if(name == 'update') {
@@ -90,7 +90,7 @@ export default function PraiseCard(props) {
                             {props.searchForm.cards == 4 ? <Chip color="warning" label={props.card.evaluation} size="small" sx={{mr : '5px'}} /> : null }
                         </Typography>
                         <Typography variant="subtitle1"  sx={{fontFamily : 'NanumGothic', fontWeight : 'bold', float : 'right'}}>
-                            {(userInfo.email == props.card.sender) && props.isClosed == 'N' ?
+                            {(info.currentUser.email == props.card.sender) && props.isClosed == 'N' ?
                                 <React.Fragment>
                                     <Link name="update" value={props.card.seq} color="inherit" onClick={handleClick}>
                                         <EditOutlinedIcon sx={{ fontSize: 'medium', mr: '5px' }} />
@@ -103,7 +103,7 @@ export default function PraiseCard(props) {
                     </CardContent>
 
                     <CardContent>
-                        <Typography variant="caption" color="text.secondary"  sx={{fontFamily : 'NanumGothic'}}> {(userInfo.email == props.card.sender) || (userInfo.name == props.card.sender) ? props.card.sendDt : props.card.readDt == '' ? '' : props.card.readDt}</Typography>
+                        <Typography variant="caption" color="text.secondary"  sx={{fontFamily : 'NanumGothic'}}> {(info.currentUser.email == props.card.sender) || (info.currentUser.name == props.card.sender) ? props.card.sendDt : props.card.readDt == '' ? '' : props.card.readDt}</Typography>
                     </CardContent>
 
                     <CardContent>

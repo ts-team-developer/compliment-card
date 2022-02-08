@@ -12,20 +12,16 @@ import {useLocation} from "react-router";
 
 // 받는사람 LIST
 // 받는 사람 리스트 조회
-const employeeList= [];
-axios.get('/api/emp/list')
-  .then(({data}) => {
-    data[0].forEach(element => {
-    employeeList.push({label : element.name_kor, value : element.email})
-  });
-})
+
+
 
 export default function Form(props) {
   const history = useHistory();
   const location = useLocation();
   const [values, setValues] = React.useState({receiver : '', content : '', seq : 0});
   const [result, setResult] = React.useState({ url : '', error : true, message : '', open : false});
-  
+  const employeeList= [];
+
   // 저장버튼 클릭 이벤트
   const handleOpen = async () => {
       axios.post('/api/card/save', values).then( async res => {
@@ -50,6 +46,8 @@ export default function Form(props) {
       message : values.content.length <  100 ? '내용은 100자 이상 입력해주세요.' : values.receiver.length <= 0 ? '받는 사람을 선택해주세요.' : ''})
   }
 
+  
+
   React.useEffect(() => {
     axios.get('/api/quarter/detail').then(({data}) => {
       if(data[0][0]) {
@@ -63,6 +61,19 @@ export default function Form(props) {
         }
       }
     });
+
+    try{
+      axios.get('/api/emp/list')
+      .then(({data}) => {
+        data[0].forEach(element => {
+        employeeList.push({label : element.name_kor, value : element.email})
+      });
+    })
+    }catch(err) {
+      console.log(err)
+    }
+
+   
     
     try{
       // 수정폼일 시 SEQ값으로 데이터를 조회한다.

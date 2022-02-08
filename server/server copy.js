@@ -9,19 +9,16 @@ const passport = require('passport');
 const path = require('path');
 const passportConfig = require('./config/passport')
 
-
 app.use(cookieParser());
 app.use("/view",express.static(path.join(__dirname, '..', 'build')));
 
-// app.get("/", function (req, res) {
-//     res.redirect('/view/list')
-//     // if(req.user === undefined) {
-//     //     res.redirect('/auth/login/google')
-//     // } else {
-//     //     res.redirect('/view/list')
-//     // }
-// })
-
+app.get("/", function (req, res) {
+    if(req.user === undefined) {
+        res.redirect('/auth/login/google')
+    } else {
+        res.redirect('/view/list')
+    }
+})
 
 app.get("/view", function (req, res) {
     res.sendFile(path.join(__dirname, '../build/index.html'));
@@ -33,50 +30,43 @@ app.use(cors({
     credentials:true
 }));
 
-app.use(bodyParser.json());
 
 app.use(session({ 
     secret:'MySecret', 
-    resave: true, 
+    resave: false, 
     saveUninitialized:true,
     cookie : {
-        httpOnly :true
-    }
+        httpOnly :true,
+    },
 }));
 
 // Passport setting
 app.use(passport.initialize()); // passport구동
 app.use(passport.session()); // session 연결
 
-passportConfig()
+passportConfig();
 
+app.get("/view/*", function (req, res) {
+    res.sendFile(path.join(__dirname, '../build/index.html'));
+});
+
+app.use(bodyParser.json());
+app.use(express.urlencoded({extended : false}));
 
 // router
 app.use('/api', require('./routes'));
 app.use('/auth', require('./routes/login'));
 
-
-app.get("/view/*", function (req, res) {
-    console.log(`/view/* : ${req.user}`)
-    if(req.user === undefined) {
-        res.redirect('/auth/login/google');
-    } else {
-        res.sendFile(path.join(__dirname, '../build/index.html'));
-    }
-});
-
-
 app.use(function(req, res, next) {
-    console.log(JSON.stringify(req.user))
-    if(req.user === undefined) {
-        res.redirect('/auth/login/google')
-    } else {
-        res.redirect('/view/list')
+    try{
+        if(req.user === undefined) {
+        }
+    }catch(err) {
+        console.log('error : ' + err)
     }
 });
 
 app.use(function(err, req, res, next) {
-    console.log('err : ' + req.user)
     res.redirect("/view/notFound")
 });
 

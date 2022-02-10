@@ -28,7 +28,10 @@ router.post('/save', async(req, res, next) => {
         if(req.user === undefined) {
             res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
             return ;
-        }else if(cards[0][0].sender == req.user.email) {
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
+            return ;
+        } else if(cards[0][0].sender == req.user.email) {
             connection.release();
             res.status(400).send({message:"자신이 칭찬한 카드는 추천할 수 없습니다."})
             return ;
@@ -50,6 +53,9 @@ router.get('/list', async(req, res, next) => {
     try{
         if(req.user === undefined) {
             res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+            return ;
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
             return ;
         } else {
             let connection = await pool.getConnection(async conn => conn)

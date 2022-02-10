@@ -23,6 +23,9 @@ router.get('/list', async(req, res, next) => {
     try{
       if(req.user === undefined) {
         return res.json(null)
+      } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+        res.status(403).send({message : '잘못된 접근입니다. '});
+        return ;
       } else {
         let connection = await pool.getConnection(async conn => conn)
         console.log("menu : "+JSON.stringify(req.user))

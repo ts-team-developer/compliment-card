@@ -26,6 +26,9 @@ router.get('/recently', async(req, res, next) => {
         if(req.user === undefined) {
             res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
             return ;
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
+            return ;
         } else {
             let connection = await pool.getConnection(async conn => conn)
             const data = await connection.query("SELECT QUARTER, ISCLOSED, ISRECCLOSED FROM CLOSED  ORDER BY QUARTER DESC LIMIT 0, 1  ")

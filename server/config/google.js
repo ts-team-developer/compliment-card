@@ -38,7 +38,7 @@ const strategy = new GoogleStrategy(
         connection.release();
         
         if(data[0][0].WORK_STS == "1") {
-          return done(null, {'loginUser' : data[0][0], 'REFRESH_TOKEN' : refreshToken});
+          return done(null, {'loginUser' : data[0][0], 'REFRESH_TOKEN' : refreshToken, 'request_token' : accessToken});
         }else {
           return done('fail', null)
         }

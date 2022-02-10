@@ -35,7 +35,9 @@ router.get('/list', async(req, res, next) => {
             if(req.user === undefined) {
                 res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
                 return ;
-                
+            } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+                res.status(403).send({message : '잘못된 접근입니다. '});
+                return ;
             } else {
                 if(cards == 5) {
                     sql += ` SELECT SEQ, QUARTER, SENDER, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER ) AS RECEIVER, REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SEND_DT, SEND_TM  `
@@ -77,6 +79,9 @@ router.get('/getEvaluationQuery', async(req, res, next) => {
     try{
         if(req.user === undefined) {
             return res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
+            return ;
         } else {
             let connection = await pool.getConnection(async conn => conn)
             const data = await connection.query(` SELECT SEQ, EVALUATION FROM card_check WHERE SEQ = ${seq} AND NAME_KOR = '${req.user.loginUser.EMAIL}'`);
@@ -94,6 +99,9 @@ router.get('/detail', async(req, res, next) => {
     try{
         if(req.user === undefined) {
             return res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
+            return ;
         } else {
             let connection = await pool.getConnection(async conn => conn)
             let sql = ` SELECT A.SEQ, A.QUARTER, A.SENDER, A.RECEIVER, A.SEND_DT,A.SEND_TM, REPLACE(A. CONTENT, CHAR(10), '\n') AS CONTENT `
@@ -133,6 +141,9 @@ router.post('/save', async(req, res, next) => {
     try{
         if(req.user === undefined) {
             res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+            return ;
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
             return ;
         } else if (req.user.quarterInfo.ISCLOSED != 'N') {
             res.status(400).send({message:"칭찬카드 작성 기간이 아닙니다. "})
@@ -194,6 +205,9 @@ router.get('/bestcard', async(req, res, next) => {
         if(req.user === undefined) {
             res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
             return ;
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
+            return ;
         } else {
             let connection = await pool.getConnection(async conn => conn)
             let sql = " SELECT B.SEQ, B.RECEIVER AS BSET_RECEIVER, B.CONTENT AS BSET_CONTENT, A.QUARTER AS BSET_QUARTER  "
@@ -230,7 +244,10 @@ router.post('/delete', async(req, res, next) => {
         if(req.user === undefined) {
             res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
             return ;
-        } else {
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
+            return ;
+        }else {
             let connection = await pool.getConnection(async conn => conn)
             let sql = ` SELECT COUNT(*) AS COUNT FROM praise_card A LEFT JOIN EMP B ON A.RECEIVER = B.EMAIL `
             sql += `LEFT JOIN EMP C ON A.SENDER = C.EMAIL  AND B.WORK_STS = 1 `

@@ -1,18 +1,14 @@
 import React, {Component} from 'react';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import FormLayout from '../card/form/FormLayout';
-import ListLayout from '../card/list/ListLayout';
-import GradeListLayout from '../card/gradelist/GradeListLayout';
-import {Status, Setting } from '../../index.js';
-import AlimPopup from '../modal/AlimPopup';
-import ConfirmPopup from '../modal/ConfirmPopup';
-
-import { connect } from 'react-redux';
-
 import axios from 'axios';
-import ErrorLayout from '../error/ErrorLayout';
+
+import { Box, Container } from '@mui/material';
+
+import { AlimPopup, ConfirmPopup } from '../modal/index';
+import { FormLayout, ListLayout, GradeListLayout, Status, Setting  } from '../card/index'
+import { ErrorLayout } from '../error/index'
+
 import { refreshRequest, logoutRequest } from '../../redux/actions/authentication'; 
+import { connect } from 'react-redux';
 
 class LayoutMain extends Component {
     constructor(props) {
@@ -31,6 +27,7 @@ class LayoutMain extends Component {
         this.handleCallback = this.handleCallback.bind(this);
 
         if(this.props.loginStatus.status.currentUser != null) {
+            // if(this.props.status.isLogged)
             if(this.props.loginStatus.login.status === "SUCCESS") {
                 axios.get('/auth/isAuthenticated', {params: {'token' : this.props.loginStatus.status.currentUser.ACCESS_TOKEN, 'isRefresh' : this.props.refresh}})
                 .then(async (response) => {
@@ -76,6 +73,7 @@ class LayoutMain extends Component {
     }
 
     render() {
+        console.log('URL : '+this.props.url)
         const layoutMain = () => {
             if(this.props.loginStatus.login.status==="SUCCESS") {
                 if(this.props.url == '/view/form') {
@@ -88,10 +86,8 @@ class LayoutMain extends Component {
                     return (<Status/>)
                 } else if(this.props.url=='/view/setting') {
                     return (<Setting/>)
-                }
-            } else {
-                return (<ErrorLayout error="auth"/>);
-            }
+                } 
+            } 
         }
 
         return (

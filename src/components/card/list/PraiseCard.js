@@ -1,19 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
+import { useHistory } from "react-router-dom";
 
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
+import { Typography, Card, CardContent, Grid, CardActions, Link, Chip } from '@mui/material';
+import { ConfirmPopup, AlimPopup } from '../../modal/index';
+import { Evaluation } from '../index'
+import axios from 'axios';
+
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { useHistory } from "react-router-dom";
-import Grid from '@mui/material/Grid';
-import CardActions from '@mui/material/CardActions';
-import Link from '@mui/material/Link';
-import ConfirmPopup from '../../modal/ConfirmPopup';
-import AlimPopup from '../../modal/AlimPopup';
-import Evaluation from './Evaluation'
-import axios from 'axios';
-import Chip from '@mui/material/Chip';
 import { useSelector } from 'react-redux';
 
 

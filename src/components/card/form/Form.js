@@ -1,24 +1,18 @@
 import * as React from 'react';
-import axios from 'axios';
-import Box from '@mui/material/Box';
-import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import { useLocation } from "react-router";
 import { Link, useHistory } from 'react-router-dom';
-import Autocomplete from '@mui/material/Autocomplete';
-import CardActions from '@mui/material/CardActions';
-import AlimPopup from '../../modal/AlimPopup'
-import {useLocation} from "react-router";
 
-// 받는사람 LIST
-// 받는 사람 리스트 조회
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
-
+import { Box, CardContent, Button, TextField, Autocomplete, CardActions } from '@mui/material';
+import { AlimPopup } from '../../modal/index';
 
 export default function Form(props) {
+  const info = useSelector(state => state.authentication.status);
   const history = useHistory();
   const location = useLocation();
-  const [values, setValues] = React.useState({receiver : '', content : '', seq : 0});
+  const [values, setValues] = React.useState({receiver : '', content : '', seq : 0, token : ''});
   const [result, setResult] = React.useState({ url : '', error : true, message : '', open : false});
   const employeeList= [];
 
@@ -45,9 +39,6 @@ export default function Form(props) {
       error : !(values.receiver.length > 0 && values.content.length > 100), 
       message : values.content.length <  100 ? '내용은 100자 이상 입력해주세요.' : values.receiver.length <= 0 ? '받는 사람을 선택해주세요.' : ''})
   }
-
-  
-
   React.useEffect(() => {
     axios.get('/api/quarter/detail').then(({data}) => {
       if(data[0][0]) {

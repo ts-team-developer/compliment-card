@@ -21,6 +21,9 @@ router.get('/isLogin', async (req, res, next) => {
 router.get('/isAuthenticated', async(req, res, next) => {
   try{
     const { token } = req.query;
+    req.session.passport.user.request_token = token;
+
+    console.log(`request token : ${req.user.request_token}`)
 
     if(token != req.user.loginUser.ACCESS_TOKEN) {
       return res.json({result : false, message : '자동 로그아웃 되었습니다.'})
@@ -50,7 +53,7 @@ router.get('/isAuthenticated', async(req, res, next) => {
         }
     } 
   }catch(err) {
-      return res.status(403).json({result : false, message : `처리 도중 오류가 발생하였습니다. ${err}`})
+      return res.json({result : false, message : `처리 도중 오류가 발생하였습니다. ${err}`})
   }
 });
 

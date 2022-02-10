@@ -1,26 +1,16 @@
 import React, { Component } from 'react';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import NotFound from './NotFound';
-import NotAuth from './NotAuth';
-
+import{ Box, Container }  from '@mui/material';
+import { NotFound, NotAuth } from './index';
 
 class ErrorLayout extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {
-    }
-  
-
     render() {
+        console.log(`error : ${this.props.error}`)
         const errorPage = () => {
-            if(this.props.error == '404') {
-                return (<NotFound/>);
-            } else if(this.props.error == 'auth'){
+            if(this.props.error == 'auth'){
                 return (<NotAuth/>);
-            } 
+            } else {
+                return (<NotFound/>);
+            }
         }
             return (
                 <React.Fragment>

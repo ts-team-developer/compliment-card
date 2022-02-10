@@ -1,17 +1,10 @@
 import * as React from 'react';
 import axios from 'axios';
-import CssBaseline from '@mui/material/CssBaseline';
-import CardContent from '@mui/material/CardContent';
-
-import Grid from '@mui/material/Grid';
-import AlimPopup from '../../modal/AlimPopup'
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import moment from 'moment';
-import PraiseCard from './PraiseCard';
 import { useSelector } from 'react-redux';
+import { CssBaseline, CardContent, Grid, InputLabel, FormControl, Select, MenuItem } from '@mui/material';
+import { PraiseCard } from '../index';
+import { AlimPopup } from '../../modal/index';
 
 
 export default function List(props) {

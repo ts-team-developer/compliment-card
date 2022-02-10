@@ -136,7 +136,6 @@ export function refreshRequest(request) {
             // 세션 갱신하면 token 값 갱신하기.. 재 로그인 처리해도 될듯 .. loginRequets();
             return axios.post('/auth/refreshToken').then((response) => {
                 try{
-                    console.log(JSON.stringify(response.data))
                     if(response.status == "200") { 
                         dispatch(refreshSuccess(response.data.access_token));
                     } else {

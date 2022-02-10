@@ -1,18 +1,10 @@
 import React, { Component } from 'react';
-import List from "./List"
-import Card from '@mui/material/Card';
-import Typography from '@mui/material/Typography';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-
 import { connect } from 'react-redux';
 import { loginRequest } from '../../../redux/actions/authentication'; 
+import { Card,Typography, CardContent, CardMedia } from '@mui/material'
+import  { List } from "../index";
 
 class ListLayout extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <React.Fragment>

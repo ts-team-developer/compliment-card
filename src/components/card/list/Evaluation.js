@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-import Rating from '@mui/material/Rating';
-import AlimPopup from '../../modal/AlimPopup';
+import { Rating } from '@mui/material';
+import { AlimPopup } from '../../modal/index';
 
 class Evaluation extends Component{
     constructor (props) {
@@ -13,11 +13,8 @@ class Evaluation extends Component{
             error : false,
             score : this.props.evaluation
         }
-
         this.handleChange = this.handleChange.bind(this);
     }
-
-
 
     handleChange = (e) => {
         axios.post('/api/evaluation/save',{'seq' : this.props.seq, 'evaluation' : e.target.value}).then( async res => {
@@ -42,13 +39,7 @@ class Evaluation extends Component{
             });
         }, 800)
     }
-
-    handleClose = (e) => {
-        
-    }
-    
     render() {
-        
         return (
             <React.Fragment>
                 <AlimPopup open={this.state.open} handleClose={this.handleClose} msg={this.state.message} error={this.state.error}/>
@@ -57,6 +48,4 @@ class Evaluation extends Component{
         )
     }
 }
-
-
 export default Evaluation;

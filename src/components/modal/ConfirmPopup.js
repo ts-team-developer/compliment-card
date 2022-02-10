@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-import Modal from '@mui/material/Modal';
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
+import { Modal, Alert, AlertTitle, Typography, Button } from '@mui/material';
 
 const style = {
     position: 'absolute',

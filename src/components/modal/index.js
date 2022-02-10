@@ -1,4 +1,5 @@
+// modal
 import AlimPopup from './AlimPopup';
 import ConfirmPopup from './ConfirmPopup';
 
-export default {AlimPopup, ConfirmPopup};
+export { AlimPopup, ConfirmPopup };

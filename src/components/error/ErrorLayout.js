@@ -1,19 +1,8 @@
 import React, { Component } from 'react';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import NotFound from './NotFound';
-import NotAuth from './NotAuth';
-
+import{ Box, Container }  from '@mui/material/Box';
+import { NotFound, NotAuth } from './index';
 
 class ErrorLayout extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    componentDidMount() {
-    }
-  
-
     render() {
         const errorPage = () => {
             if(this.props.error == '404') {

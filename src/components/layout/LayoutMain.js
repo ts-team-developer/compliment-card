@@ -1,19 +1,14 @@
 import React, {Component} from 'react';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import FormLayout from '../card/form/FormLayout';
-import ListLayout from '../card/list/ListLayout';
-import GradeListLayout from '../card/gradelist/GradeListLayout';
-import {Status, Setting } from '../../index.js';
-import AlimPopup from '../modal/AlimPopup';
-import ConfirmPopup from '../modal/ConfirmPopup';
-
-
-import { connect } from 'react-redux';
-
 import axios from 'axios';
-import ErrorLayout from '../error/ErrorLayout';
+
+import { Box, Container } from '@mui/material';
+
+import { AlimPopup, ConfirmPopup } from '../modal/index';
+import { FormLayout, ListLayout, GradeListLayout, Status, Setting  } from '../card/index'
+import { ErrorLayout } from '../error/index'
+
 import { refreshRequest, logoutRequest } from '../../redux/actions/authentication'; 
+import { connect } from 'react-redux';
 
 class LayoutMain extends Component {
     constructor(props) {

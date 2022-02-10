@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import axios from 'axios';
-import LayoutMain from './layout/LayoutMain'
-import LayoutHeader from './layout/LayoutHeader'
-import ErrorLayout from './error/ErrorLayout'
 
 import { connect } from 'react-redux';
 import { loginRequest, logoutRequest } from '../redux/actions/authentication'; 
-import AlimPopup from '../components/modal/AlimPopup';
+
+import { LayoutHeader, LayoutMain } from './layout/index';
+import { AlimPopup } from './modal/index'
 
 class App extends Component {
   constructor(props) {

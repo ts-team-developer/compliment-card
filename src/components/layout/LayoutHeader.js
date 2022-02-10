@@ -1,20 +1,8 @@
 import React, { Component } from "react";
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
+import { AppBar, Box, Toolbar, Typography, Button, Alert, AlertTitle, IconButton, CloseIcon, Collapse } from '@mui/material'
 import { connect } from 'react-redux';
-import Alert from '@mui/material/Alert'
-import AlertTitle from '@mui/material/AlertTitle'
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Collapse from '@mui/material/Collapse';
-
 import { alertHidden } from '../../redux/actions/authentication'
-
 
 class LayoutHeader extends Component {
   constructor (props) {
@@ -25,15 +13,9 @@ class LayoutHeader extends Component {
   handleClose = (e) => {
     e.preventDefault();
     this.props.alertHidden();
-    // window.localStorage.setItem('alert', false);
-    // this.setState({
-    //   open : false
-    // })
   }
 
   render() {
-    console.log(JSON.stringify(this.props.info))
-    console.log(this.props.info.show)
     return (
       <React.Fragment>
         <Box sx={{ flexGrow: 1 }} >

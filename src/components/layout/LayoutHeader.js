@@ -19,26 +19,26 @@ import { alertHidden } from '../../redux/actions/authentication'
 class LayoutHeader extends Component {
   constructor (props) {
     super(props);
-    this.state = {
-      open : window.localStorage.getItem("alert")
-    }
     this.handleClose = this.handleClose.bind(this);
   }
 
   handleClose = (e) => {
     e.preventDefault();
-    window.localStorage.setItem('alert', false);
-    this.setState({
-      open : false
-    })
+    this.props.alertHidden();
+    // window.localStorage.setItem('alert', false);
+    // this.setState({
+    //   open : false
+    // })
   }
 
   render() {
+    console.log(JSON.stringify(this.props.info))
+    console.log(this.props.info.show)
     return (
       <React.Fragment>
         <Box sx={{ flexGrow: 1 }} >
           <Stack sx={{ width: '100%' }} spacing={4}>
-            <Collapse in={this.state.open}>
+            <Collapse in={this.props.info.show}>
               <Alert severity="warning"  sx={{ border: '1px solid #eee'}}
                       action={
                         <IconButton aria-label="close"

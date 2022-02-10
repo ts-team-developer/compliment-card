@@ -8,6 +8,7 @@ import {Status, Setting } from '../../index.js';
 import AlimPopup from '../modal/AlimPopup';
 import ConfirmPopup from '../modal/ConfirmPopup';
 
+
 import { connect } from 'react-redux';
 
 import axios from 'axios';
@@ -31,6 +32,7 @@ class LayoutMain extends Component {
         this.handleCallback = this.handleCallback.bind(this);
 
         if(this.props.loginStatus.status.currentUser != null) {
+            // if(this.props.status.isLogged)
             if(this.props.loginStatus.login.status === "SUCCESS") {
                 axios.get('/auth/isAuthenticated', {params: {'token' : this.props.loginStatus.status.currentUser.ACCESS_TOKEN, 'isRefresh' : this.props.refresh}})
                 .then(async (response) => {

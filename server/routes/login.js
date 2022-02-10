@@ -50,7 +50,7 @@ router.get('/isAuthenticated', async(req, res, next) => {
         }
     } 
   }catch(err) {
-      return res.status(403).json({result : false, message : `처리 도중 오류가 발생하였습니다. ${err}`})
+      return res.json({result : false, message : `처리 도중 오류가 발생하였습니다. ${err}`})
   }
 });
 

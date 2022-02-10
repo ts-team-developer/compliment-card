@@ -13,7 +13,8 @@ const initialState = {
         valid : false,
         isLoggedIn: false,
         currentUser : null,
-        quarterInfo : null
+        quarterInfo : null,
+        show : true
     }
 };
 
@@ -22,15 +23,9 @@ export default function authentication(state, action) {
         state = initialState;
 
     switch(action.type) {
+        // 로그아웃 진행
         case types.AUTH_LOGOUT :
-            return {
-                ...state,
-                login : {
-                    ...state.login,
-                    status : "INIT",
-                    refresh: false
-                }
-            }
+            return initialState
 
         case types.AUTH_LOGIN :
             return {
@@ -45,13 +40,16 @@ export default function authentication(state, action) {
                 ...state,
                 login : {
                     status : 'SUCCESS',
-                    refresh : false
+                    refresh : false,
+                    isLoggedIn : true,
+                    valid : false
                 },
                 status : {
                     ...state.status,
                     isLoggedIn : true,
                     currentUser : action.user.loginUser,
-                    quarterInfo : action.user.quarterInfo
+                    quarterInfo : action.user.quarterInfo,
+                    show : !(action.user.quarterInfo.ISCLOSED == 'Y' && action.user.quarterInfo.ISRECCLOSED == 'Y')
                 }
             }
         
@@ -72,7 +70,6 @@ export default function authentication(state, action) {
                 },
                 status : {
                     ...state.status,
-                    isLoggedIn : true,
                     currentUser : {
                         ...state.status.currentUser,
                         ACCESS_TOKEN : action.token
@@ -85,7 +82,7 @@ export default function authentication(state, action) {
                     ...state,
                     login : {
                         ...state.login,
-                        refresh:true
+                        refresh : true,
                     }
                 }
 
@@ -100,7 +97,6 @@ export default function authentication(state, action) {
             }
             
          case types.AUTH_GET_STATUS_SUCCESS :
-            console.log(`AUTH_GET_STATUS_SUCCESS`)
             return {
                 status : {
                     ...state.status,
@@ -109,7 +105,6 @@ export default function authentication(state, action) {
             }
             
         case types.AUTH_GET_STATUS_FAILURE:
-            console.log(`AUTH_GET_STATUS_FAILURE`)
             return {
                 ...state,
                 status: {
@@ -120,8 +115,9 @@ export default function authentication(state, action) {
         case types.ALERT_STATUS :
             return {
                 ...state,
-                login : {
-                    alert : false
+                status : {
+                    ...state.status,
+                    show : false 
                 }
             }
 

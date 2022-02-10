@@ -8,6 +8,7 @@ const port = process.env.PORT || 3001;
 const passport = require('passport');
 const path = require('path');
 const passportConfig = require('./config/passport')
+require('dotenv').config();
 
 
 app.use(cookieParser());
@@ -24,6 +25,7 @@ app.use("/view",express.static(path.join(__dirname, '..', 'build')));
 
 
 app.get("/view", function (req, res) {
+    
     res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
@@ -67,7 +69,6 @@ app.get("/view/*", function (req, res) {
 
 
 app.use(function(req, res, next) {
-    console.log(JSON.stringify(req.user))
     if(req.user === undefined) {
         res.redirect('/auth/login/google')
     } else {

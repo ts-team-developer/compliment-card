@@ -44,7 +44,6 @@ class App extends Component {
   }
 
   handleLogout = () => {
-    console.log('APP.js HandleLogout1')
     this.props.logoutRequest().then(() => {
       this.setState({
         result : {

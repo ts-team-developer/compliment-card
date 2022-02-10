@@ -3,6 +3,7 @@ const refresh = require('passport-oauth2-refresh')
 
 const GoogleStrategy   = require('passport-google-oauth20').Strategy;
 const pool = require('../config/pool')
+require('dotenv').config();
 
 pool.getConnection((err, connection) => {
     if (err) {
@@ -23,9 +24,9 @@ pool.getConnection((err, connection) => {
 
 const strategy = new GoogleStrategy(
   {
-    clientID      : "346544479744-khv0riu09o6pr3sm55hlh5i14fmeggmf.apps.googleusercontent.com",
-    clientSecret  : "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",
-    callbackURL   : 'http://127.0.0.1:3001/auth/google/callback',
+    clientID      : process.env.GOOGLE_CLIENT_ID,
+    clientSecret  : process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL   : '/auth/google/callback',
     passReqToCallback   : true
   }, async function(request, accessToken, refreshToken, profile, done){
       try{

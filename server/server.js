@@ -14,18 +14,7 @@ require('dotenv').config();
 app.use(cookieParser());
 app.use("/view",express.static(path.join(__dirname, '..', 'build')));
 
-// app.get("/", function (req, res) {
-//     res.redirect('/view/list')
-//     // if(req.user === undefined) {
-//     //     res.redirect('/auth/login/google')
-//     // } else {
-//     //     res.redirect('/view/list')
-//     // }
-// })
-
-
 app.get("/view", function (req, res) {
-    
     res.sendFile(path.join(__dirname, '../build/index.html'));
 });
 
@@ -69,16 +58,19 @@ app.get("/view/*", function (req, res) {
 
 
 app.use(function(req, res, next) {
+    const err = new Error("NOT Found");
+    err.status = 404;
     if(req.user === undefined) {
         res.redirect('/auth/login/google')
     } else {
         res.redirect('/view/list')
     }
+    // next(err);
 });
 
 app.use(function(err, req, res, next) {
-    console.log('err : ' + req.user)
-    res.redirect("/view/notFound")
+    console.log('err test ' + err.status)
+    // res.redirect("/view/notFound")
 });
 
 const http = require('http').createServer(app);

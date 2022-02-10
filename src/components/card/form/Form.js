@@ -3,13 +3,16 @@ import { useLocation } from "react-router";
 import { Link, useHistory } from 'react-router-dom';
 
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+
 import { Box, CardContent, Button, TextField, Autocomplete, CardActions } from '@mui/material';
 import { AlimPopup } from '../../modal/index';
 
 export default function Form(props) {
+  const info = useSelector(state => state.authentication.status);
   const history = useHistory();
   const location = useLocation();
-  const [values, setValues] = React.useState({receiver : '', content : '', seq : 0});
+  const [values, setValues] = React.useState({receiver : '', content : '', seq : 0, token : ''});
   const [result, setResult] = React.useState({ url : '', error : true, message : '', open : false});
   const employeeList= [];
 

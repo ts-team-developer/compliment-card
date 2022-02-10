@@ -1,15 +1,8 @@
 import React, { Component } from 'react';
-import { NotInterestedIcon, Box, Card, Typography, CardContent, CardMedia } from '@mui/material';
+import { Box, Card, Typography, CardContent, CardMedia } from '@mui/material';
+import NotInterestedIcon from '@mui/icons-material/NotInterested';
 
 class NotFound extends Component {
-    constructor(props) {
-        super(props); 
-    }
-
-    componentDidMount() {
-        setTimeout(() => {
-        }, 3000)
-    }
     render() {
         return (
             <Box component="form" noValidate  autoComplete="off"  > 

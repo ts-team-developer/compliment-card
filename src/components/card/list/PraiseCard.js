@@ -1,10 +1,14 @@
 import React from 'react';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { Typography, Card, CardContent, EditOutlinedIcon, DeleteOutlineOutlinedIcon, Grid, CardActions, Link, Chip } from '@mui/material';
 import { useHistory } from "react-router-dom";
+
+import { Typography, Card, CardContent, Grid, CardActions, Link, Chip } from '@mui/material';
 import { ConfirmPopup, AlimPopup } from '../../modal/index';
-import { Evaluation } from '../index';
+import { Evaluation } from '../index'
+import axios from 'axios';
+
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { useSelector } from 'react-redux';
 
 
 export default function PraiseCard(props) {

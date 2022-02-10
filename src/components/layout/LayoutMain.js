@@ -73,6 +73,7 @@ class LayoutMain extends Component {
     }
 
     render() {
+        console.log('URL : '+this.props.url)
         const layoutMain = () => {
             if(this.props.loginStatus.login.status==="SUCCESS") {
                 if(this.props.url == '/view/form') {
@@ -85,10 +86,8 @@ class LayoutMain extends Component {
                     return (<Status/>)
                 } else if(this.props.url=='/view/setting') {
                     return (<Setting/>)
-                }
-            } else {
-                return (<ErrorLayout error="auth"/>);
-            }
+                } 
+            } 
         }
 
         return (

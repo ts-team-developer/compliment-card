@@ -25,7 +25,10 @@ router.post('/save', async(req, res, next) => {
         // 자신이 추천한 카드는 추천할 수 없습니다.
         let connection = await pool.getConnection(async conn => conn)
         const cards = await connection.query(`SELECT * FROM praise_card WHERE SEQ =  ${req.body.seq}`);
-        if(cards[0][0].sender == req.user.email) {
+        if(req.user === undefined) {
+            res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+            return ;
+        }else if(cards[0][0].sender == req.user.email) {
             connection.release();
             res.status(400).send({message:"자신이 칭찬한 카드는 추천할 수 없습니다."})
             return ;
@@ -45,10 +48,15 @@ router.post('/save', async(req, res, next) => {
 
 router.get('/list', async(req, res, next) => {
     try{
-        let connection = await pool.getConnection(async conn => conn)
-        const data = await connection.query(` SELECT SEQ, EVALUATION FROM card_check WHERE SEQ = ${seq} AND NAME_KOR = '${req.user.email}'`);
-        connection.release();
-        return res.json(data);
+        if(req.user === undefined) {
+            res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+            return ;
+        } else {
+            let connection = await pool.getConnection(async conn => conn)
+            const data = await connection.query(` SELECT SEQ, EVALUATION FROM card_check WHERE SEQ = ${seq} AND NAME_KOR = '${req.user.email}'`);
+            connection.release();
+            return res.json(data);
+        }
     }catch(err) {
         console.log(err)
     }

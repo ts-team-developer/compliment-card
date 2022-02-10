@@ -4,7 +4,7 @@ import moment from 'moment';
 import { useSelector } from 'react-redux';
 import { CssBaseline, CardContent, Grid, InputLabel, FormControl, Select, MenuItem } from '@mui/material';
 import { PraiseCard } from '../index';
-import AlimPopup from '../../modal/index';
+import { AlimPopup } from '../../modal/index';
 
 
 export default function List(props) {

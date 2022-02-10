@@ -1,8 +1,14 @@
 import * as React from 'react';
 import axios from 'axios';
+import { styled, CardContent, Typography, Grid } from '@mui/material';
 
-import { styled, CardContent, Typography, ExpandMoreIcon, ArrowForwardIosSharpIcon, MuiAccordion, MuiAccordionSummary, MuiAccordionDetails } from '@mui/material';
-import { GradeList } from '../index'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowForwardIosSharpIcon from '@mui/icons-material/ArrowForwardIosSharp';
+import MuiAccordion from '@mui/material/Accordion';
+import MuiAccordionSummary from '@mui/material/AccordionSummary';
+import MuiAccordionDetails from '@mui/material/AccordionDetails';
+
+import { GradeList } from '../index';
 
 const Accordion = styled((props) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />

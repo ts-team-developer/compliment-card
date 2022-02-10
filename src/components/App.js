@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import axios from 'axios';
 
 import { connect } from 'react-redux';
@@ -7,6 +7,7 @@ import { loginRequest, logoutRequest } from '../redux/actions/authentication';
 
 import { LayoutHeader, LayoutMain } from './layout/index';
 import { AlimPopup } from './modal/index'
+import { NotFound, ErrorLayout } from './error/index';
 
 class App extends Component {
   constructor(props) {
@@ -63,20 +64,20 @@ class App extends Component {
     return (
       <React.Fragment>
         <AlimPopup open={this.state.result.open} handleClose={this.handleClose} msg={this.state.result.message} error={this.state.result.error}/>
+        <Router>
             <Switch>
               { this.state.menuList ? this.state.menuList.map((menu, index) => {
                 return (
-                  <Route path={menu.MENU_URL} component = {() => 
+                  <Route exact path={menu.MENU_URL} component = {() => 
                     <LayoutMain onLogin={this.handleLogin} url={menu.MENU_URL} loginStatus={this.props.status} onLogout={this.handleLogout}  >
                       <LayoutHeader menuList={this.state.menuList} />
                     </LayoutMain>
                     }/>)
                   } 
                   ) : <LayoutMain onLogin={this.handleLogin} url='' loginStatus={this.props.status} onLogout={this.handleLogout} ></LayoutMain> }
-                  {/* <Route exact={true} path="/view/logout">
-                    <Logout />
-                  </Route> */}
+                <Route path={"*"} component={ErrorLayout}/>
               </Switch>
+              </Router>
       </React.Fragment>
     );    
   }

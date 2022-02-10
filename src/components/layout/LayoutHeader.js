@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Link } from 'react-router-dom';
-import { AppBar, Box, Toolbar, Typography, Button, Alert, AlertTitle, IconButton, CloseIcon, Collapse } from '@mui/material'
 import { connect } from 'react-redux';
+import { AppBar, Box, Toolbar, Typography, Button, Alert, AlertTitle, IconButton, Collapse, Stack} from '@mui/material'
 import { alertHidden } from '../../redux/actions/authentication'
+import CloseIcon from '@mui/icons-material/Close';
 
 class LayoutHeader extends Component {
   constructor (props) {
@@ -16,6 +17,8 @@ class LayoutHeader extends Component {
   }
 
   render() {
+    console.log(JSON.stringify(this.props.info))
+    console.log(this.props.info.show)
     return (
       <React.Fragment>
         <Box sx={{ flexGrow: 1 }} >

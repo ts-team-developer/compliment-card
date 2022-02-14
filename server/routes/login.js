@@ -23,10 +23,8 @@ router.get('/isAuthenticated', async(req, res, next) => {
     const { token } = req.query;
     req.session.passport.user.request_token = token;
 
-    console.log(`request token : ${req.user.request_token}`)
-
     if(token != req.user.loginUser.ACCESS_TOKEN) {
-      return res.json({result : false, message : '자동 로그아웃 되었습니다.'})
+      return res.json({valid : false, message : '자동 로그아웃 되었습니다.'})
     } else if(req.isAuthenticated()) {
         const { data } = await axios({
           method : 'POST',

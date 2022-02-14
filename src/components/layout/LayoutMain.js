@@ -5,7 +5,6 @@ import { Box, Container } from '@mui/material';
 
 import { AlimPopup, ConfirmPopup } from '../modal/index';
 import { FormLayout, ListLayout, GradeListLayout, Status, Setting  } from '../card/index'
-import { ErrorLayout } from '../error/index'
 
 import { refreshRequest, logoutRequest } from '../../redux/actions/authentication'; 
 import { connect } from 'react-redux';
@@ -27,11 +26,11 @@ class LayoutMain extends Component {
         this.handleCallback = this.handleCallback.bind(this);
 
         if(this.props.loginStatus.status.currentUser != null) {
-            // if(this.props.status.isLogged)
             if(this.props.loginStatus.login.status === "SUCCESS") {
-                axios.get('/auth/isAuthenticated', {params: {'token' : this.props.loginStatus.status.currentUser.ACCESS_TOKEN, 'isRefresh' : this.props.refresh}})
+                axios.get('/auth/isAuthenticated', {params: {'token' : this.props.loginStatus.status.currentUser.ACCESS_TOKEN }})
                 .then(async (response) => {
-                    if(!this.props.login.refresh) {
+                    // 자동 로그아웃 연장 유무
+                    if(!this.props.login.isAutoLogout) {
                         if(response.data.result == true && response.data.message != null) {
                             this.setState({
                                 open : true,
@@ -59,7 +58,7 @@ class LayoutMain extends Component {
     // 취소 버튼을 누르면 리덕스 를 호출하려
     handleClose = () => {
         // refresh가 true이면, 로그인 연장 안하고, 결국 로그아웃 창이 떴을거임..
-        if(this.props.login.refresh) {
+        if(this.props.login.isAutoLogout) {
             // 로그아웃 처리하기 (REDUX)
             this.props.onLogout();
         } else {
@@ -73,7 +72,6 @@ class LayoutMain extends Component {
     }
 
     render() {
-        console.log('URL : '+this.props.url)
         const layoutMain = () => {
             if(this.props.loginStatus.login.status==="SUCCESS") {
                 if(this.props.url == '/view/form') {

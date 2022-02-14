@@ -7,10 +7,9 @@ import * as types from '../actions/ActionTypes';
 const initialState = {
     login : {
         status : 'INIT',
-        refresh : false
+        isAutoLogout : false
     },
     status : {
-        valid : false,
         isLoggedIn: false,
         currentUser : null,
         quarterInfo : null,
@@ -40,9 +39,8 @@ export default function authentication(state, action) {
                 ...state,
                 login : {
                     status : 'SUCCESS',
-                    refresh : false,
-                    isLoggedIn : true,
-                    valid : false
+                    isAutoLogout : false,
+                    isLoggedIn : true
                 },
                 status : {
                     ...state.status,
@@ -66,7 +64,7 @@ export default function authentication(state, action) {
                 ...state,
                 login : {
                     ...state.login,
-                    refresh : false
+                    isAutoLogout : false
                 },
                 status : {
                     ...state.status,
@@ -82,36 +80,10 @@ export default function authentication(state, action) {
                     ...state,
                     login : {
                         ...state.login,
-                        refresh : true,
+                        isAutoLogout : true,
                     }
                 }
 
-      
-
-        case types.AUTH_GET_STATUS:
-            return {
-                ...state,
-                status : {
-                    ...state.status,
-                }
-            }
-            
-         case types.AUTH_GET_STATUS_SUCCESS :
-            return {
-                status : {
-                    ...state.status,
-                    valid : true,
-                }
-            }
-            
-        case types.AUTH_GET_STATUS_FAILURE:
-            return {
-                ...state,
-                status: {
-                    valid: false,
-                    isLoggedIn: false
-                }
-            }
         case types.ALERT_STATUS :
             return {
                 ...state,

@@ -3,9 +3,6 @@ import {
     AUTH_LOGIN, 
     AUTH_LOGIN_SUCCESS, 
     AUTH_LOGIN_FAILURE, 
-    AUTH_GET_STATUS,
-    AUTH_GET_STATUS_SUCCESS,
-    AUTH_GET_STATUS_FAILURE,
     AUTH_LOGOUT,
     ALERT_STATUS,
     REFRESH_TOKEN_SUCCESS,
@@ -63,49 +60,6 @@ export function loginFailure() {
         type : AUTH_LOGIN_FAILURE
     }
 }
-
-
-export function getStatusRequest(token) {
-    return (dispatch) => {
-        if(typeof token === undefined) {
-            dispatch(getStatusFailure())
-        } else {
-            dispatch(getStatus())
-            return axios.get('/auth/isAuthenticated', {params: {'token' : token}})
-                .then(async (response) => {
-                    if(response.data == true) {
-                        dispatch(getStatusSuccess());
-                    } else {
-                        dispatch(getStatusFailure());
-                    }
-                }).catch((err) => {
-                    console.log(err)
-                    dispatch(getStatusFailure());
-                });
-            
-        }
-    };
-}
-
-
-export function getStatus() {
-    return {
-        type: AUTH_GET_STATUS
-    };
-}
-
-export function getStatusSuccess() {
-    return {
-        type: AUTH_GET_STATUS_SUCCESS
-    };
-}
-
-export function getStatusFailure() {
-    return {
-        type: AUTH_GET_STATUS_FAILURE
-    };
-}
-
 
 
 export function logoutRequest() {

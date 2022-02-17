@@ -50,7 +50,13 @@ router.get('/list', async(req, res, next) => {
             return ;
         } else {
             let connection = await pool.getConnection(async conn => conn)
-            const data = await connection.query("SELECT * FROM CLOSED ")
+            let sql = `SELECT * FROM CLOSED `;
+
+            if(req.query.sort=='desc'){
+                sql+= `ORDER BY QUARTER DESC`
+            }
+
+            const data = await connection.query(sql)
             connection.release();
             return res.json(data)
         }

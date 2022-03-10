@@ -18,38 +18,34 @@ export default function FixedContainer() {
 
   const columns = [
     // { field: 'idx', headerName: '순서', width: 90 },
-     { field: 'name', headerName: '이름', width: 150,},
-    { field: 'Q1', headerName: '1분기', width: 150,},
-    { field: 'Q2', headerName: '2분기', width: 150,},
-    { field: 'Q3', headerName: '3분기', width: 150,},
-    { field: 'Q4', headerName: '4분기', width: 150,}
+    { field: 'QUARTER', headerName: '년도', width: 200,},
+    { field: 'SENDER', headerName: '작성자', width: 200,},
+    { field: 'SUM', headerName: '점수', width: 300,}
   ];
 
 
   const info = useSelector(state => state.authentication.status);
 
-  const quarter = (info.quarterInfo.QUARTER).substr(0,6);
-
   const [rows, setRowList] = React.useState([]);
-  const [value, setValue] = React.useState(quarter);
+  const [value, setValue] = React.useState((info.quarterInfo.QUARTER).substr(0,7));
+  const [value2, setValue2] = React.useState("");
 
-  const [searchForm, setSearchForm] = React.useState({ quarter : quarter , isPraise : 'Y' });
-  const [cardStyle, setCardStyle] = React.useState({border : "1px solid rgb(25, 118, 210)",backgroud : "rgba(25, 118, 210, 0.04)"});
-  const [card2Style, setCard2Style] = React.useState();
+  const [searchForm, setSearchForm] = React.useState({ quarter : (info.quarterInfo.QUARTER).substr(0,7) });
 
-  const quarterList= [];
+  const quarterList= ['1분기','2분기','3분기','4분기'];
+  const yearList= [];
 
-   axios.get('/api/quarter/listOfYear' , {params: { sort : 'Y' }} )
+   axios.get('/api/quarter/listOfYear' , {params: { sort : 'Y' }})
     .then(({data}) => {
       data[0].forEach(element => {
-        quarterList.push({label : element.QUARTER})
+        yearList.push({label : element.QUARTER})
       });
     })
 
 
   React.useEffect( () => {
       
-    axios.get('/api/statistics/year', {params : searchForm})
+    axios.get('/api/statistics/point', {params : searchForm})
     .then(({data}) => {
         try{
             setRowList(data[0]);
@@ -58,30 +54,15 @@ export default function FixedContainer() {
         }
     });
 
-  },[info, value, searchForm]);
+  },[info, value, value2, searchForm]);
 
   const handleClick = () => {
     if(value.label==undefined){
-      setSearchForm({quarter:value, isPraise : 'Y'})
+      setSearchForm({quarter: value + value2 })  
     } else{
-      setSearchForm({quarter:value.label, isPraise : 'Y'})
+      setSearchForm({quarter: value.label + value2 })
     }
-
-    setCardStyle( { border : "1px solid rgb(25, 118, 210)",backgroud : "rgba(25, 118, 210, 0.04)" })
-    setCard2Style( { border : "1px solid rgb(211, 211, 211)", backgroud : "white" })
   }
-
-  const handleClick2 = () => {
-  if(value.label==undefined){
-    setSearchForm({quarter:value, isPraise : 'N'})
-  } else{
-    setSearchForm({quarter:value.label, isPraise : 'N'})
-  }
-
-  
-  setCard2Style( { border : "1px solid rgb(25, 118, 210)",backgroud : "rgba(25, 118, 210, 0.04)" })
-  setCardStyle( { border : "1px solid rgb(211, 211, 211)", backgroud : "white" })
-}
 
   return (
     <React.Fragment>
@@ -99,24 +80,35 @@ export default function FixedContainer() {
                   <Autocomplete
                       disablePortal
                       id="combo-box-demo"
-                      options={quarterList}
+                      options={yearList}
                       value={value}
                       onChange={(event, newValue) => {
                         setValue(newValue);
+                      }}
+                      sx={{ m :2, ml: -1, width: '20%', display: 'inline-block'}}
+                      renderInput={(params) => <TextField {...params} label="칭찬카드 년도" />}
+                      size="small"
+                  />
+                  <Autocomplete
+                      disablePortal
+                      id="combo-box-demo"
+                      options={quarterList}
+                      value={value2}
+                      onChange={(event, newValue2) => {
+                        setValue2(newValue2);
                       }}
                       sx={{ m :2, ml: -1, width: '20%', display: 'inline-block'}}
                       renderInput={(params) => <TextField {...params} label="칭찬카드 분기" />}
                       size="small"
                   />
                   <Typography variant="body2" sx={{display: 'inline-block', verticalAlign:'middle', mt:1.5, ml:2 }}>
-                        <Button variant="outlined" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3', marginRight:'5px' }} style={cardStyle} onClick={handleClick} >칭찬 함</Button>  
-                        <Button variant="outlined" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3' }} style={card2Style} onClick={handleClick2} >칭찬 받음</Button>  
+                        <Button variant="outlined" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3' }}  onClick={handleClick} >조회</Button>  
                   </Typography>
               </Box>
             </CardContent>
                 <CardContent>
                 <div style={{ height: 400, width: '100%' }}>
-                  <DataGrid getRowId={(rows) => rows.id}
+                  <DataGrid getRowId={(rows) => rows.idx}
                     rows={rows}
                     columns={columns}
                     pageSize={10}

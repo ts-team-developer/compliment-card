@@ -48,7 +48,7 @@ router.get('/list', async(req, res, next) => {
             if(cards==1){
                 sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 `
                 if(req.user.quarterInfo.QUARTER!=req.query.quarter){
-                  sql += `AND P.QUARTER='${quarter}`;
+                  sql += `AND P.QUARTER='${quarter}'`;
                 }   
             }else if(cards==2){
                 sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 AND E.EMAIL NOT IN (SELECT SENDER FROM PRAISE_CARD P WHERE P.QUARTER='${quarter}') AND E.NAME_KOR NOT IN (SELECT SENDER FROM PRAISE_CARD P WHERE P.QUARTER='${quarter}') `

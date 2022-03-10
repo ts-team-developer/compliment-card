@@ -171,7 +171,7 @@ export default function FixedContainer() {
                         </React.Fragment>
                       }
                       {
-                          (info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='Y' ) && 
+                          (info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='Y' &&  info.quarterInfo.ISCLOSED=='N') && 
                         <React.Fragment>
                         <Badge badgeContent={unreadMembers} color="error" sx={{ml: 1, fontFamily:'Nanum Gothic'}}>
                           <Button variant="outlined" color="error" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3'}} style={card3Style} onClick={handleClick3}>미투표 조회</Button>   

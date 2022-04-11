@@ -137,7 +137,7 @@ export default function FixedContainer() {
     <React.Fragment>
       <CssBaseline />
       <Container fixed >
-        <Box sx={{ bgcolor: 'none', height: '100vh' }} sx={{ mt: 6 }} >
+        <Box sx={{ bgcolor: 'none', height: '100vh',mt: 6 }}  >
             <Card variant="outlined">
             <CardContent>
               <Box

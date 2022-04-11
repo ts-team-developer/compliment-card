@@ -8,7 +8,7 @@ class ListLayout extends Component {
     render() {
         return (
             <React.Fragment>
-            <Card variant="outlined" sx={{mb : 10, pt: 3}}>
+            <Card variant="outlined" sx={{mb : '100px', pt: 3}}>
                     {/* Card Header */}
                     <CardMedia sx={{m:3, borderBottom: '1px solid #eee'}} >
                         <Typography variant="h5" component="div" sx={{fontFamily:'NanumSquare', fontWeight: 'bold'}}>
@@ -28,7 +28,7 @@ class ListLayout extends Component {
                     </CardMedia>
 
                     {/* Card Content */}
-                    <CardContent>
+                    <CardContent >
                         <List  />    
                     </CardContent>
                 </Card>

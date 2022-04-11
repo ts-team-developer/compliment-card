@@ -7,6 +7,8 @@ import { PraiseCard } from '../index';
 import { AlimPopup } from '../../modal/index';
 
 
+const formStyle = { m: 1, minWidth: 120, width: {xs : '100%', md:'auto'} };
+
 export default function List(props) {
   // 작성 중일 때 : quarter : thisQuarter, cards=1(내가쓴카드)
   // 추천 중일 때 : quarter : thisQuarter,  cards=안읽은 카드
@@ -73,9 +75,9 @@ export default function List(props) {
       {/* 알림 모달창 띄우기 */}
       <AlimPopup open={result.open} handleClose={handleClose} msg={result.message} error={result.error}/>
       
-      <CardContent>
+      <CardContent  sx={{ pt :'0'}}>
         {/* 검색 조건 */}
-        <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <FormControl sx={formStyle}>
           <InputLabel id="demo-simple-select-label">분기</InputLabel>
             <Select labelId="demo-simple-select-label" id="demo-simple-select" name="quarter" label="분기" value={searchForm.quarter}  size="small" onChange={handleChange}>
               {quarterList ? quarterList.map((el, key) => {
@@ -83,7 +85,7 @@ export default function List(props) {
             </Select>
           </FormControl>
 
-          <FormControl sx={{ m: 1, minWidth: 120 }}>
+          <FormControl  sx={formStyle}>
                 <InputLabel id="demo-simple-select-label">카드</InputLabel>
                 <Select labelId="demo-simple-select-label" id="demo-simple-select" name="cards" label="카드"  size="small" value={searchForm.cards}  
                   onChange={handleChange}>

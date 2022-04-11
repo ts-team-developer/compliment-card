@@ -84,7 +84,7 @@ export default function PraiseCard(props) {
                             {props.searchForm.cards == 4 ? <Chip color="warning" label={props.card.evaluation} size="small" sx={{mr : '5px'}} /> : null }
                         </Typography>
                         <Typography variant="subtitle1"  sx={{fontFamily : 'NanumGothic', fontWeight : 'bold', float : 'right'}}>
-                            {(info.currentUser.email == props.card.sender) && props.isClosed == 'N' ?
+                            {(info.currentUser.EMAIL == props.card.sender) && props.isClosed == 'N' ?
                                 <React.Fragment>
                                     <Link name="update" value={props.card.seq} color="inherit" onClick={handleClick}>
                                         <EditOutlinedIcon sx={{ fontSize: 'medium', mr: '5px' }} />

@@ -8,6 +8,7 @@ router.get('/isLogin', async (req, res, next) => {
     if(req.user === undefined) {
       res.redirect('/auth/login/google')
     } else {
+      req.user.loginUser.PHOTO = req.user.photo;
       res.json({'loginUser' : req.user.loginUser, 'quarterInfo' : req.user.quarterInfo})
     }
   }catch(err) {
@@ -34,8 +35,8 @@ router.get('/isAuthenticated', async(req, res, next) => {
           },
           params:{
             grant_type: 'authorization_code',//특정 스트링
-            client_id:"346544479744-khv0riu09o6pr3sm55hlh5i14fmeggmf.apps.googleusercontent.com",
-            client_secret:"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",
+            client_id:process.env.GOOGLE_CLIENT_ID,
+            client_secret:process.env.GOOGLE_CLIENT_SECRET,
             access_token : req.user.loginUser.ACCESS_TOKEN,
           }
         });

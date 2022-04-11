@@ -1,42 +1,54 @@
-import React, { Component } from "react";
+import * as React from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { AppBar, Box, Toolbar, Typography, Button, Alert, AlertTitle, IconButton, Collapse, Stack} from '@mui/material'
+
+import { AppBar, Box, Toolbar, Typography, Button, Alert, AlertTitle, IconButton, Collapse, Stack, Container, MenuItem, Menu, Avatar, Tooltip } from '@mui/material'
 import { alertHidden } from '../../redux/actions/authentication'
+import axios from 'axios';
+import moment from 'moment';
+import { useSelector, useDispatch } from 'react-redux';
 import CloseIcon from '@mui/icons-material/Close';
+import MenuIcon from '@mui/icons-material/Menu';
 
-class LayoutHeader extends Component {
-  constructor (props) {
-    super(props);
-    this.handleClose = this.handleClose.bind(this);
+
+const LayoutHeader = (props) => {
+  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const info = useSelector(state => state.authentication.status);
+  const status = useSelector(state => state.authentication.login) ;
+  const dispatch = useDispatch();
+
+  console.log(` info : ${JSON.stringify(info)}`)
+  console.log(` status : ${JSON.stringify(info)}`)
+
+  const handleOpenNavMenu = (event) => {
+    setAnchorElNav(event.currentTarget);
+  };
+
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
+  const handleClose = () => {
+    dispatch(alertHidden());
   }
 
-  handleClose = (e) => {
-    e.preventDefault();
-    this.props.alertHidden();
-  }
-
-  render() {
-    console.log(JSON.stringify(this.props.info))
-    console.log(this.props.info.show)
-    return (
-      <React.Fragment>
-        <Box sx={{ flexGrow: 1 }} >
+  return (
+    <AppBar position="static">
+      <Box sx={{ flexGrow: 1 }} >
           <Stack sx={{ width: '100%' }} spacing={4}>
-            <Collapse in={this.props.info.show}>
+            <Collapse in={info.show}>
               <Alert severity="warning"  sx={{ border: '1px solid #eee'}}
                       action={
                         <IconButton aria-label="close"
                           color="inherit"
                           size="small"
-                          onClick={this.handleClose}>
+                          onClick={handleClose}>
                         <CloseIcon fontSize="inherit" />
                       </IconButton> }>
-                <AlertTitle sx={{fontFamily : 'NanumSquare'}}> 
-                    <strong> {this.props.info.quarterInfo.QUARTER}</strong> 
-                    {this.props.info.quarterInfo.ISCLOSED == 'N' ? 
+                <AlertTitle sx={{fontFamily : 'NanumSquare', fontSize : {xs: 'small', md:'medium'}, paddingTop : {xs : '3px', md: 'auto'}}}> 
+                    <strong> {info.quarterInfo.QUARTER}</strong> 
+                    {info.quarterInfo.ISCLOSED == 'N' ? 
                       ' 칭찬카드 작성기간입니다.' 
-                      : this.props.info.quarterInfo.ISRECCLOSED == 'N' ?
+                      : info.quarterInfo.ISRECCLOSED == 'N' ?
                       ' 칭찬카드 추천기간입니다.'
                       : ''
                     }
@@ -44,46 +56,87 @@ class LayoutHeader extends Component {
               </Alert>
             </Collapse>
           </Stack>
+          </Box>
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+          >칭찬카드
+          </Typography>
 
-          <AppBar position="static" >
-            <Toolbar variant="dense">
-              <Typography variant="h6" color="inherit" component="div" sx={{ mr: 4, fontFamily: 'NanumGothic' }}>칭찬카드</Typography>
-              <Stack direction="row" spacing={2}  color="inherit" sx={{ flexGrow : 1 }}>
-                {this.props.menuList.map((menu, i) => {
-                  return (
-                    <Link to={menu.MENU_URL} style={{ textDecoration: 'none', color: 'white'}}  > 
-                      <Button color="inherit" style={{  fontFamily: 'NanumGothic'  }}> {menu.MENU_NM}</Button>
-                    </Link>
-                  );
-                })}
-              </Stack>
+          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleOpenNavMenu}
+              color="inherit"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorElNav}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'left',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'left',
+              }}
+              open={Boolean(anchorElNav)}
+              onClose={handleCloseNavMenu}
+              sx={{
+                display: { xs: 'block', md: 'none' },
+              }}
+            >
+             
+              {props.menuList.map((menu) => (   
+                <MenuItem key={menu.MENU_URL} onClick={handleCloseNavMenu}>
+                  <Link to={menu.MENU_URL} style={{ textDecoration: 'none', color : '#000'}}  > 
+                    <Typography textAlign="center">{menu.MENU_NM}</Typography>
+                  </Link>
+                </MenuItem>
+              ))}
+            </Menu>
+          </Box>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
+          >
+            칭찬카드
+          </Typography>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            {props.menuList.map((menu) => (
+              <Button
+                key={menu}
+                onClick={handleCloseNavMenu}
+                sx={{ my: 2, color: 'white', display: 'block' }} >
+                <Link to={menu.MENU_URL} style={{ textDecoration: 'none', color : '#fff'}}  > 
+                  <Typography textAlign="center">{menu.MENU_NM}</Typography>
+                </Link>
+              </Button>
+            ))}
+          </Box>
 
-              <Stack direction="row" spacing={1} color="inherit" > 
-                <Typography variant="body1" style={{fontFamily : 'NanumGothic'}}  gutterBottom>
-                  {this.props.info.currentUser.NAME_KOR}
-                </Typography>
-            </Stack>
-          </Toolbar>
-        </AppBar>
-      </Box>
-    </React.Fragment>
-    )
-  };
-}
-const mapStateToProps = (state) => {
-  return {
-      info : state.authentication.status,
-      status : state.authentication.login
-  };
+          <Box sx={{ flexGrow: 0 }}>
+            <Tooltip title={info.currentUser.NAME_KOR}>
+              <IconButton sx={{ p: 0 }}>
+                <Avatar alt={info.currentUser.EMAIL} src={info.currentUser.PHOTO} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Toolbar>
+      </Container>
+    </AppBar>
+  );
 };
-
-const mapStateToDispatch = (dispatch) => {
-  return {
-    alertHidden : () => {
-      return dispatch(alertHidden());
-    }
-  }
-}
-
-export default  connect(mapStateToProps,mapStateToDispatch)(LayoutHeader);
- 
+export default LayoutHeader;

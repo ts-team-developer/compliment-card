@@ -95,7 +95,7 @@ class LayoutMain extends Component {
             {this.props.loginStatus.login.status === "SUCCESS" ? this.props.children : null}
             
             <Container fixed >
-                <Box sx={{ bgcolor: 'none', height: '100vh' }} sx={{ mt: 10 }} >
+                <Box sx={{ bgcolor: 'none', height: '100vh', m:  { xs : '20px -5px', md: '7% -8%'} }}  >
                     <Box component="form" noValidate  autoComplete="off"  > 
                         {layoutMain()} 
                     </Box>

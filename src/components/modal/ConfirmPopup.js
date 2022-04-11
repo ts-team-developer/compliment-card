@@ -6,7 +6,8 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
+    width: {'xs' : '80%', 'md':'400px'},
+    minWidth: '140',
     boxShadow: 24,
     p: 4,
   };

@@ -36,9 +36,8 @@ const strategy = new GoogleStrategy(
         let connection = await pool.getConnection(async conn => conn);
         const data = await connection.query(queryString);
         connection.release();
-        
         if(data[0][0].WORK_STS == "1") {
-          return done(null, {'loginUser' : data[0][0], 'REFRESH_TOKEN' : refreshToken, 'request_token' : accessToken});
+          return done(null, {'loginUser' : data[0][0], 'REFRESH_TOKEN' : refreshToken, 'request_token' : accessToken, 'photo' : profile.photos[0].value });
         }else {
           return done('fail', null)
         }

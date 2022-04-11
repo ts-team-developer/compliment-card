@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { BrowserView, MobileView, isBrowser, isMobile} from 'react-device-detect';
 import { Card, CardContent, CardMedia, Typography } from '@mui/material'
 import { Form } from "../index"
 
@@ -18,7 +19,7 @@ class FormLayout extends Component {
                             <p style={{fontFamily:'NanumSquare'}}>분기 별로 가장 많이 칭찬을 받은 카드를 상단 '우수 칭찬카드' 메뉴에서 확인할 수 있으니 작성 시 참조해주세요.</p>
                         </Typography>
                 
-                        <Typography sx={{ mb: 1.5, mt:3, fontFamily: 'NanumGothic', ml:2 }} color="text.secondary">
+                        <Typography sx={{ mb: 1.5, mt:3, fontFamily: 'NanumGothic' }} variant="body2" color="text.secondary">
                             미담 (美談) : 사람을 감동시킬 만큼 아름다운 내용을 가진 이야기
                         </Typography>
                     </CardMedia>

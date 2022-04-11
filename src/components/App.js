@@ -70,7 +70,7 @@ class App extends Component {
                 return (
                   <Route exact path={menu.MENU_URL} component = {() => 
                     <LayoutMain onLogin={this.handleLogin} url={menu.MENU_URL} loginStatus={this.props.status} onLogout={this.handleLogout}  >
-                      <LayoutHeader menuList={this.state.menuList} />
+                      <LayoutHeader menuList={this.state.menuList}  />
                     </LayoutMain>
                     }/>)
                   } 

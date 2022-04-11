@@ -23,10 +23,7 @@ pool.getConnection((err, connection) => {
 router.get('/list', async(req, res, next) => {
     try{
         const {cards, quarter} = req.query;
-
-        console.log("card 값 " +cards)
-        console.log("quarter 값 " +quarter)
-    
+        
         if(req.user === undefined) {
             return res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
           } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
@@ -34,18 +31,33 @@ router.get('/list', async(req, res, next) => {
             return ;
           } else {
             let connection = await pool.getConnection(async conn => conn)
-            let sql = ` SELECT @ROWNUM := @ROWNUM+1 AS idx, E.NAME_KOR AS name, `
+            
+            let sql = "";
+            let tmp = "";
+
+            if(req.user.quarterInfo.QUARTER!=req.query.quarter){
+              tmp = "AND P.QUARTER='${quarter}";
+            }
+            
+            sql += ` SELECT @ROWNUM := @ROWNUM+1 AS idx, E.NAME_KOR AS name, `
             sql += ` (SELECT COUNT(*) FROM PRAISE_CARD P WHERE P.QUARTER ='${quarter}' AND P.SENDER IN (E.EMAIL, E.NAME_KOR)) AS card, `
             sql += ` (SELECT COUNT(*) FROM CARD_CHECK C LEFT JOIN PRAISE_CARD P ON C.SEQ=P.SEQ WHERE  P.QUARTER='${quarter}' AND C.NAME_KOR IN (E.NAME_KOR, E.EMAIL)) AS readCard, `;
             sql += ` (SELECT COUNT(*) FROM PRAISE_CARD P WHERE P.SENDER NOT IN (E.NAME_KOR, E.EMAIL) AND NOT EXISTS (SELECT 'X' FROM CARD_CHECK C WHERE C.SEQ = P.SEQ AND NAME_KOR IN (E.NAME_KOR, E.EMAIL)) AND QUARTER = '${quarter}') AS unreadCard, `
             sql += ` (SELECT COUNT(*) FROM PRAISE_CARD WHERE RECEIVER=E.NAME_KOR AND QUARTER='${quarter}') AS receiveCard `
             sql += ` FROM EMP E LEFT JOIN PRAISE_CARD P ON E.NAME_KOR = P.SENDER OR E.EMAIL =P.SENDER, (SELECT @ROWNUM :=0) AS R `
             if(cards==1){
-                sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 AND P.QUARTER='${quarter}' `
+                sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 `
+                if(req.user.quarterInfo.QUARTER!=req.query.quarter){
+                  sql += `AND P.QUARTER='${quarter}'`;
+                }   
             }else if(cards==2){
                 sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 AND E.EMAIL NOT IN (SELECT SENDER FROM PRAISE_CARD P WHERE P.QUARTER='${quarter}') AND E.NAME_KOR NOT IN (SELECT SENDER FROM PRAISE_CARD P WHERE P.QUARTER='${quarter}') `
             }else if(cards==3){
-                sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 AND EXISTS (SELECT SENDER FROM PRAISE_CARD P WHERE P.SENDER NOT IN (E.NAME_KOR, E.EMAIL) AND NOT EXISTS (SELECT 'X' FROM CARD_CHECK C WHERE C.SEQ = P.SEQ AND NAME_KOR IN (E.NAME_KOR, E.EMAIL)) AND QUARTER = '${quarter}') `
+                sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 AND EXISTS (SELECT SENDER FROM PRAISE_CARD P WHERE P.SENDER NOT IN (E.NAME_KOR, E.EMAIL) AND NOT EXISTS (SELECT 'X' FROM CARD_CHECK C WHERE C.SEQ = P.SEQ AND NAME_KOR IN (E.NAME_KOR, E.EMAIL))`
+                if(req.user.quarterInfo.QUARTER!=req.query.quarter){
+                  sql += `AND QUARTER = '${quarter}' `
+                }  
+                sql += `)`
             }
 
             sql += ` GROUP BY E.EMAIL ORDER BY E.NAME_KOR `
@@ -100,7 +112,7 @@ router.get('/list', async(req, res, next) => {
             let connection = await pool.getConnection(async conn => conn)
             
             let sql = `SELECT COUNT(DISTINCT E.EMAIL) AS COUNT FROM EMP E , PRAISE_CARD P `
-            sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 AND P.QUARTER='${req.user.quarterInfo.QUARTER}' AND E.EMAIL NOT IN (SELECT SENDER FROM PRAISE_CARD P WHERE P.QUARTER='${req.user.quarterInfo.QUARTER}') `
+            sql += ` WHERE E.END_DATE IS NULL AND E.WORK_STS = 1 AND E.EMAIL NOT IN (SELECT SENDER FROM PRAISE_CARD P WHERE P.QUARTER='${req.user.quarterInfo.QUARTER}') `
             sql += ` AND E.NAME_KOR NOT IN (SELECT SENDER FROM PRAISE_CARD P WHERE P.QUARTER='${req.user.quarterInfo.QUARTER}') `
             
             const data = await connection.query(sql)

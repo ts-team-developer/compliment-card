@@ -35,14 +35,14 @@ export default function FixedContainer() {
   const [rows, setRowList] = React.useState([]);
   const [value, setValue] = React.useState(info.quarterInfo.QUARTER);
   const [card1Style, setCard1Style] = React.useState({border : "1px solid rgb(25, 118, 210)",backgroud : "rgba(25, 118, 210, 0.04)"});
-  const [card2Sytle, setCard2Style] = React.useState();
+  const [card2Style, setCard2Style] = React.useState();
   const [card3Style, setCard3Style] = React.useState();
 
   const [searchForm, setSearchForm] = React.useState({ quarter : info.quarterInfo.QUARTER, cards : '1' });
 
   const quarterList= [];
 
-  axios.get('/api/quarter/list', {params: { sort : 'desc' }})
+  axios.get('/api/quarter/list', {params: { sort : 'Y' }})
     .then(({data}) => {
       data[0].forEach(element => {
         quarterList.push({label : element.quarter})
@@ -81,7 +81,7 @@ export default function FixedContainer() {
       }
     });
 
-  },[info, value, searchForm]);
+  },[info, value, searchForm, card1Style, card2Style, card3Style]);
 
   const handleClick = () => {
     if(value.label==undefined){
@@ -105,6 +105,7 @@ export default function FixedContainer() {
     backgroud : "rgba(211, 47, 47, 0.04)" })
     change1();
     change3();
+    
   }
   
   const handleClick3 = () => {
@@ -162,11 +163,16 @@ export default function FixedContainer() {
                         <Button variant="outlined" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3' }} style={card1Style} onClick={handleClick} >전체 조회</Button>  
                       </Badge> 
                       {
-                        info.quarterInfo.QUARTER==searchForm.quarter && 
+                        (info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='N' ) && 
                         <React.Fragment>
                         <Badge badgeContent={unwrittenMembers} color="error" sx={{ml: 1, fontFamily:'Nanum Gothic'}} >
-                          <Button variant="outlined" color="error" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3'}} style={card2Sytle} onClick={handleClick2}>미작성 조회</Button>  
+                          <Button variant="outlined" color="error" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3'}} style={card2Style} onClick={handleClick2}>미작성 조회</Button>  
                         </Badge> 
+                        </React.Fragment>
+                      }
+                      {
+                          (info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='Y' &&  info.quarterInfo.ISCLOSED=='N') && 
+                        <React.Fragment>
                         <Badge badgeContent={unreadMembers} color="error" sx={{ml: 1, fontFamily:'Nanum Gothic'}}>
                           <Button variant="outlined" color="error" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3'}} style={card3Style} onClick={handleClick3}>미투표 조회</Button>   
                         </Badge> 

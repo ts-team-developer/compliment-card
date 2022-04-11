@@ -16,6 +16,7 @@ import GradeListLayout from './gradelist/GradeListLayout';
 import Status from './status/status';
 
 // 통계
+import Statistics from './statistics/statistics';
 
 // 관리
 import Setting from './setting/setting'
@@ -26,5 +27,6 @@ export {
                 List, ListLayout, Evaluation, PraiseCard,
                 GradeList, GradeListLayout,
                 Status,
-                Setting 
+                Setting,
+                Statistics
         }

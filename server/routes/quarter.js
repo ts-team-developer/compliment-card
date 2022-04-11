@@ -52,7 +52,31 @@ router.get('/list', async(req, res, next) => {
             let connection = await pool.getConnection(async conn => conn)
             let sql = `SELECT * FROM CLOSED `;
 
-            if(req.query.sort=='desc'){
+            if(req.query.sort=='Y'){
+                sql+= `ORDER BY QUARTER DESC`
+            }
+
+            const data = await connection.query(sql)
+            connection.release();
+            return res.json(data)
+        }
+    }catch (err){
+        console.log(`quarter list : ${err}`)
+        return res.status(500).json(err)
+    }
+});
+
+// 분기(YYYY년) 전체 조회
+router.get('/listOfYear', async(req, res, next) => {
+    try{
+        if(req.user === undefined) {
+            res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+            return ;
+        } else {
+            let connection = await pool.getConnection(async conn => conn)
+            let sql = `SELECT DISTINCT LEFT(QUARTER,7) AS QUARTER FROM CLOSED `;
+
+            if(req.query.sort=='Y'){
                 sql+= `ORDER BY QUARTER DESC`
             }
 

@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Box, Container } from '@mui/material';
 
 import { AlimPopup, ConfirmPopup } from '../modal/index';
-import { FormLayout, ListLayout, GradeListLayout, Status, Setting  } from '../card/index'
+import { FormLayout, ListLayout, GradeListLayout, Status, Statistics, Setting  } from '../card/index'
 
 import { refreshRequest, logoutRequest } from '../../redux/actions/authentication'; 
 import { connect } from 'react-redux';
@@ -82,9 +82,11 @@ class LayoutMain extends Component {
                     return (<GradeListLayout/>)
                 }else if(this.props.url == '/view/status') {
                     return (<Status/>)
+                } else if(this.props.url=='/view/statistics') {
+                    return (<Statistics/>)
                 } else if(this.props.url=='/view/setting') {
                     return (<Setting/>)
-                } 
+                }
             } 
         }
 

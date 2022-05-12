@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
-import { Card, CardContent, CardMedia, Typography,Tabs,Tab, Box } from '@mui/material'
+import { Card, CardContent, CardMedia, Typography, Link, Breadcrumbs, Tabs,Tab, Box, Grid } from '@mui/material'
+import { Statistics } from "../index"
 import { usePcStyles, useMobileStyles } from "../../../styles/styles"
 import { useMediaQuery } from "@material-ui/core";
 import PropTypes from 'prop-types';
 import SwipeableViews from 'react-swipeable-views';
 import { useTheme } from '@mui/material/styles';
-import WorkerMain from './WorkerMain'
-import MenuMain from './MenuMain'
-import QuarterMain from './QuarterMain'
+import StaticYear from  './static-year';
+import StaticPoint from  './static-point';
+import StaticPeople from  './static-people';
+
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -40,6 +42,10 @@ function TabPanel(props) {
       'aria-controls': `full-width-tabpanel-${index}`,
     };
   }
+  function handleClick(event) {
+    event.preventDefault();
+    console.info('You clicked a breadcrumb.');
+  }
 
 export default function FormLayout () {
     const theme = useTheme();
@@ -62,7 +68,7 @@ export default function FormLayout () {
                 {/* Card Header */}
                 <CardMedia sx={{padding: '10px'}}>
                     <Typography variant="h5" component="div" className={classes.titleb0} >
-                       <b>관리</b> 
+                       <b>통계</b> 
                     </Typography>
                     
                 </CardMedia>
@@ -71,9 +77,9 @@ export default function FormLayout () {
                         onChange={handleChange}
                         indicatorColor="primary"
                         aria-label="full width tabs example" >
-                        <Tab label="직원관리" {...a11yProps(0)}  />
-                        <Tab label="메뉴관리" {...a11yProps(1)} />
-                        <Tab label="분기관리" {...a11yProps(2)} />
+                        <Tab label="년도별 통계" {...a11yProps(0)}  />
+                        <Tab label="직원별 통계" {...a11yProps(1)} />
+                        <Tab label="점수별 통계" {...a11yProps(2)} />
                     </Tabs>
                 </CardContent>
                 <SwipeableViews
@@ -81,13 +87,13 @@ export default function FormLayout () {
                     index={value}
                     onChangeIndex={handleChangeIndex} >
                     <TabPanel value={value} index={0} dir={theme.direction}>
-                        <WorkerMain/>
+                        <StaticYear/>
                     </TabPanel>
                     <TabPanel value={value} index={1} dir={theme.direction}>
-                        <MenuMain/>
+                        <StaticPeople/>
                     </TabPanel>
                     <TabPanel value={value} index={2} dir={theme.direction}>
-                        <QuarterMain />
+                        <StaticPoint/>
                     </TabPanel>
                     </SwipeableViews>
             </Card>

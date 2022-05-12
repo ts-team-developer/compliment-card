@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import './styles/font.css';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
 import Root from './Root';
@@ -9,12 +10,20 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import reducers from './redux/reducer/index';
 import thunk from 'redux-thunk';
-  
-const store = createStore(reducers, applyMiddleware(thunk));
+import { createTheme, ThemeProvider } from '@mui/material';
 
+const store = createStore(reducers, applyMiddleware(thunk));
+const theme = createTheme({
+  typography: {
+    fontFamily: 'NanumGothic',
+  },
+  
+});
 ReactDOM.render(
   <Provider store={store}>
-    <Root />
+    <ThemeProvider theme={theme}>
+      <Root />
+    </ThemeProvider>
   </Provider>,
   document.getElementById('root')
 );

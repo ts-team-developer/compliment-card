@@ -119,17 +119,15 @@ router.get('/getQuarterList', async(req, res, next) => {
             return ;
         } else {
 			const {year, quarter} = req.query;
-
 			let addWhere = "";
 
 			if (year != 0) addWhere = "and quarter like '" + year + "%'";
 			if (quarter != 0) addWhere += " and quarter like '%" + quarter + "%'";
 
 			let connection = await pool.getConnection(async conn => conn)
-			const data = await connection.query("select c.quarter, case when c.isClosed = 'Y' then 'O' else 'X' end isClosed, " +
-			"case when c.isRecClosed = 'Y' then 'O' else 'X' end isRecClosed from closed c WHERE 1 = 1 " + addWhere + " order by quarter desc")
+            const data = await connection.query(` SELECT QUARTER, ISCLOSED, ISRECCLOSED FROM CLOSED WHERE 1 = 1 ${addWhere} ORDER BY QUARTER DESC `);
 			connection.release();
-			return res.json(data)
+			return res.json(data[0])
 		}
     }catch (err){
       console.log(err);

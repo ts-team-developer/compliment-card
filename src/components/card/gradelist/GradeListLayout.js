@@ -79,13 +79,11 @@ export default function FixedContainer() {
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
-                                <CardContent>
                                     <Grid container spacing={2}>
                                     {posts && posts.map((el1, key) => {
                                         return (quarters.quarter == el1.BSET_QUARTER) ?
                                             <GradeList list = {el1}/>  : null  } ) }
                                     </Grid>
-                                </CardContent>
                             </Typography>
                         </AccordionDetails>
                     </Accordion>

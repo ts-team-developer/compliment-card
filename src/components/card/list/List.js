@@ -6,10 +6,14 @@ import { CssBaseline, CardContent, Grid, InputLabel, FormControl, Select, MenuIt
 import { PraiseCard } from '../index';
 import { AlimPopup } from '../../modal/index';
 
-
-const formStyle = { m: 1, minWidth: 120, width: {xs : '100%', md:'auto'} };
+import { usePcStyles, useMobileStyles } from "../../../styles/styles"
+import { useMediaQuery } from "@material-ui/core"
 
 export default function List(props) {
+    // Style 관련 CSS
+    const isMobile = useMediaQuery("(max-width: 600px)");
+    const classes = usePcStyles();
+    const mobile = useMobileStyles();
   // 작성 중일 때 : quarter : thisQuarter, cards=1(내가쓴카드)
   // 추천 중일 때 : quarter : thisQuarter,  cards=안읽은 카드
   // 마감 : quarter : cardes : 안읽은 카드(5) 혹은 전체 카드
@@ -53,14 +57,12 @@ export default function List(props) {
         }catch(error) {
           console.log(error)
         }
-       
       });
     };                                           
 
     fetchQuarter();
     fetchPosts();
- }, [searchForm, info]);
-
+ }, [searchForm, info, result]);
 
  const handleChange = (e) => {
   const { name, value } = e.target;
@@ -74,20 +76,22 @@ export default function List(props) {
     <CssBaseline />
       {/* 알림 모달창 띄우기 */}
       <AlimPopup open={result.open} handleClose={handleClose} msg={result.message} error={result.error}/>
-      
-      <CardContent  sx={{ pt :'0'}}>
+      <CardContent className = {classes.p0} mb = {2}>
         {/* 검색 조건 */}
-        <FormControl sx={formStyle}>
-          <InputLabel id="demo-simple-select-label">분기</InputLabel>
-            <Select labelId="demo-simple-select-label" id="demo-simple-select" name="quarter" label="분기" value={searchForm.quarter}  size="small" onChange={handleChange}>
-              {quarterList ? quarterList.map((el, key) => {
-                return ( <MenuItem value={el.quarter}>{el.quarter}</MenuItem>  ) }) : null};
-            </Select>
-          </FormControl>
-
-          <FormControl  sx={formStyle}>
+        <Grid container spacing={1}>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth className={isMobile ? mobile.searchEl : classes.searchEl} >
+              <InputLabel id="demo-simple-select-label">분기</InputLabel>
+              <Select labelId="demo-simple-select-label" size="small" id="demo-simple-select" name="quarter"  className={isMobile ? mobile.searchEl : classes.searchEl} label="분기" value={searchForm.quarter}  onChange={handleChange}>
+                {quarterList ? quarterList.map((el, key) => {
+                  return ( <MenuItem value={el.quarter}>{el.quarter}  </MenuItem>  ) }) : null};
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} md={2} >
+            <FormControl fullWidth className={isMobile ? mobile.searchEl : classes.searchEl}>
                 <InputLabel id="demo-simple-select-label">카드</InputLabel>
-                <Select labelId="demo-simple-select-label" id="demo-simple-select" name="cards" label="카드"  size="small" value={searchForm.cards}  
+                <Select labelId="demo-simple-select-label" id="demo-simple-select" className={isMobile ? mobile.searchEl : classes.searchEl}  name="cards" label="카드"  size="small" value={searchForm.cards}  
                   onChange={handleChange}>
                   <MenuItem value={5}>안 읽은 카드</MenuItem>
                   <MenuItem value={4}>추천카드</MenuItem>
@@ -96,10 +100,12 @@ export default function List(props) {
                   <MenuItem value={1}>내가쓴카드</MenuItem>
                 </Select>
           </FormControl>
+          </Grid>
+        </Grid>
       </CardContent>
 
       {/* 카드 리스트 시작 */}
-      <CardContent>
+      <CardContent  className = {classes.p0} sx={{mt : '20px'}}>
         <Grid container spacing={3}>
           {posts ? posts.map((el, key) => {
           const praiseCard = {
@@ -108,6 +114,7 @@ export default function List(props) {
             sender : el.SENDER, 
             content : el.CONTENT,
             evaluation : el.EVALUATION, 
+            category : el.CATEGORY,
             sendDt : moment(el.SEND_DT).format('YYYY-MM-DD') + " " + el.SEND_TM,
             readDt : el.READ_DT === undefined ? '' : moment(el.READ_DT).format('YYYY-MM-DD') + " " + el.READ_TM
           }

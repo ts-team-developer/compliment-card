@@ -51,28 +51,28 @@ export default function MenuModal(props) {
   };
 
   React.useEffect(() => {
-    if (props.row.length > 0) {
-        setEditQuarter(props.row[0].substring(7));
-    } else {
-        setEditQuarter("1분기");
-    }
+    // if (props.row.length > 0) {
+    //     setEditQuarter(props.row[0].substring(7));
+    // } else {
+    //     setEditQuarter("1분기");
+    // }
 
-    if (props.row[1] === 'O') {
-        setIsClosedChecked(true);
-        setIsClosed('Y');
-    } else {
-        setIsClosedChecked(false);
-        setIsClosed('N');
-    }
+    // if (props.row[1] === 'O') {
+    //     setIsClosedChecked(true);
+    //     setIsClosed('Y');
+    // } else {
+    //     setIsClosedChecked(false);
+    //     setIsClosed('N');
+    // }
 
-    if (props.row[2] === 'O') {
-        setIsRecClosedChecked(true);
-        setIsRecClosed('Y');
-    } else {
-        setIsRecClosedChecked(false);
-        setIsRecClosed('N');
-    }
-  }, [props.row]);
+    // if (props.row[2] === 'O') {
+    //     setIsRecClosedChecked(true);
+    //     setIsRecClosed('Y');
+    // } else {
+    //     setIsRecClosedChecked(false);
+    //     setIsRecClosed('N');
+    // }
+  }, []);
 
   return (
     <Box>

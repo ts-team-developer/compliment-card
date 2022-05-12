@@ -2,21 +2,17 @@ import * as React from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Badge from '@mui/material/Badge';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
 import { DataGrid }  from '@mui/x-data-grid';
-import { style } from '@mui/system';
+import { Card, CardContent, Button, Badge, TextField, Autocomplete, Grid, Box, Typography, CardMedia } from '@mui/material';
+import { usePcStyles, useMobileStyles } from "../../../styles/styles"
+import { useMediaQuery } from "@material-ui/core";
 
-  
+
 export default function FixedContainer() {
-
+  // Style 관련 CSS
+  const isMobile = useMediaQuery("(max-width: 600px)");
+  const classes = usePcStyles();
+  const mobile = useMobileStyles();
   const columns = [
     // { field: 'idx', headerName: '순서', width: 90 },
     { field: 'name', headerName: '이름', width: 120 },
@@ -65,12 +61,6 @@ export default function FixedContainer() {
     .then(({data}) => {
       setUnreadMembers(data[0][0].COUNT);
     });
-
-
-    // axios.get('/api/status/listByQuarter', {params: { params : searchForm }})
-    // .then(({data}) => {
-    //   setStatus((data[0][0].isClosed=='N') ? '진행중' : '진행완료');
-    // });
 
     axios.get('/api/status/list', {params: searchForm })
     .then(({data}) => {
@@ -136,65 +126,63 @@ export default function FixedContainer() {
   return (
     <React.Fragment>
       <CssBaseline />
-      <Container fixed >
-        <Box sx={{ bgcolor: 'none', height: '100vh',mt: 6 }}  >
-            <Card variant="outlined">
-            <CardContent>
-              <Box
-              component="form"
-              noValidate
-              autoComplete="off"
-              sx={{mb : -2, ml : 2 , fontWeight:'bold'}}
-              >
+        <Card variant="outlined"  className={isMobile ? mobile.card : classes.card}>
+          <CardMedia className={isMobile ? mobile.cardTop  : classes.cardTop}>
+            <Typography variant="h5" component="div" className={classes.title} >
+              <b>진행현황</b>
+            </Typography>
+            <Box component="form" noValidate autoComplete="off" >
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={3}>
                   <Autocomplete
-                      disablePortal
-                      id="combo-box-demo"
-                      options={quarterList}
-                      value={value}
-                      onChange={(event, newValue) => {
-                        setValue(newValue);
-                      }}
-                      sx={{ m :2, ml: -1, width: '20%', display: 'inline-block'}}
-                      renderInput={(params) => <TextField {...params} label="칭찬카드 분기" />}
-                      size="small"
-                  />
-                  <Typography variant="body2" sx={{display: 'inline-block', verticalAlign:'middle', mt:1.5, ml:2 }}>
-                       <Badge badgeContent={totalMembers} color="primary" sx={{ml: -1, fontFamily:'Nanum Gothic'}} >
-                        <Button variant="outlined" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3' }} style={card1Style} onClick={handleClick} >전체 조회</Button>  
+                        disablePortal
+                        id="combo-box-demo"
+                        options={quarterList}
+                        value={value}
+                        onChange={(event, newValue) => {
+                          setValue(newValue);
+                        }}
+                        renderInput={(params) => <TextField {...params} label="칭찬카드 분기" />}
+                        size="small" />
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Grid container spacing={1}>
+                    <Grid item xs={12} md={3}>
+                      <Badge badgeContent={totalMembers} color="primary" className={mobile.fullWidth}  >
+                        <Button variant="outlined" style={card1Style} onClick={handleClick} className={mobile.fullWidth}  >전체조회</Button>  
                       </Badge> 
-                      {
-                        (info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='N' ) && 
-                        <React.Fragment>
-                        <Badge badgeContent={unwrittenMembers} color="error" sx={{ml: 1, fontFamily:'Nanum Gothic'}} >
-                          <Button variant="outlined" color="error" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3'}} style={card2Style} onClick={handleClick2}>미작성 조회</Button>  
+                    </Grid>
+                    {(info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='N' ) && 
+                      <Grid item xs={12} md={3}>
+                        <Badge badgeContent={unwrittenMembers} color="error" className={mobile.fullWidth} >
+                          <Button variant="outlined" color="error"  style={card2Style} onClick={handleClick2} className={mobile.fullWidth}>미작성조회</Button>  
                         </Badge> 
-                        </React.Fragment>
-                      }
-                      {
-                          (info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='Y' &&  info.quarterInfo.ISCLOSED=='N') && 
-                        <React.Fragment>
-                        <Badge badgeContent={unreadMembers} color="error" sx={{ml: 1, fontFamily:'Nanum Gothic'}}>
-                          <Button variant="outlined" color="error" sx={{fontWeight:'bold' , color:'#5f5f5f', border:'1px solid #d3d3d3'}} style={card3Style} onClick={handleClick3}>미투표 조회</Button>   
-                        </Badge> 
-                        </React.Fragment>
-                      }
-                      {/* <Button variant="outlined" sx={{ml:1, fontWeight:'bold'}} >작성마감</Button>*/}
-                  </Typography>
-              </Box>
-            </CardContent>
-                <CardContent>
-                <div style={{ height: 600, width: '100%' }}>
-                  <DataGrid getRowId={(rows) => rows.idx}
-                    rows={rows}
-                    columns={columns}
-                    pageSize={10}
-                    rowsPerPageOptions={[5]}
-                  />
-                </div>
-                </CardContent>
-            </Card>
-        </Box>
-      </Container>
+                      </Grid>
+                    }
+                    {(info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='Y' &&  info.quarterInfo.ISCLOSED=='N') && 
+                      <Grid item xs={12} md={3}>
+                        <Badge badgeContent={unreadMembers} color="error" className={mobile.fullWidth}>
+                          <Button variant="outlined" color="error"  style={card3Style}  onClick={handleClick3} className={mobile.fullWidth} >미투표조회</Button>   
+                        </Badge>
+                      </Grid>
+                    }
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Box>
+          </CardMedia>
+       
+          <CardContent>
+            <div style={{ height: 600, width: '100%' }}>
+              <DataGrid getRowId={(rows) => rows.idx}
+                rows={rows}
+                columns={columns}
+                pageSize={10}
+                rowsPerPageOptions={[5]}
+              />
+            </div>
+          </CardContent>
+        </Card>
     </React.Fragment>
   );
 }

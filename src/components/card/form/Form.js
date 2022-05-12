@@ -3,24 +3,27 @@ import { useLocation } from "react-router";
 import { Link, useHistory } from 'react-router-dom';
 
 import axios from 'axios';
-import { useSelector } from 'react-redux';
 
-import { Box, CardContent, Button, TextField, Autocomplete, CardActions, Grid } from '@mui/material';
+import { Box, Button, TextField, Autocomplete, CardActions, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { AlimPopup } from '../../modal/index';
 
-
+import { usePcStyles, useMobileStyles } from "../../../styles/styles"
+import { useMediaQuery } from "@material-ui/core";
 
 const employeeList= [];
 
 export default function Form(props) {
-  const style = { display : 'block', width: '100%', textAlign : 'center', borderRadius : '0' }
+    // Style 관련 CSS
+    const isMobile = useMediaQuery("(max-width: 600px)");
+    const classes = usePcStyles();
+    const mobile = useMobileStyles();
 
-  const info = useSelector(state => state.authentication.status);
-  const history = useHistory();
-  const location = useLocation();
-  const [values, setValues] = React.useState({receiver : '', content : '', seq : 0, token : ''});
-  const [result, setResult] = React.useState({ url : '', error : true, message : '', open : false});
-
+    const history = useHistory();
+    const location = useLocation();
+    const [values, setValues] = React.useState({receiver : '', content : '', seq : 0, token : '', category : ''});
+    const [result, setResult] = React.useState({ url : '', error : true, message : '', open : false});
+    const [categories, setCategories] = React.useState([]);
+    
   // 저장버튼 클릭 이벤트
   const handleOpen = async () => {
       axios.post('/api/card/save', values).then( async res => {
@@ -38,12 +41,14 @@ export default function Form(props) {
   }
 
   const handleChange = (e, params) => {
-    const { name, value } = (typeof params == "undefined") ? e.target : {name : 'receiver', value :params.value}
+    // const { name, value } = (typeof params == "undefined") ? e.target : {name : 'receiver', value :params.value}
+    const {name , value } = (e.target.name == 'category' || e.target.name=='content') ? e.target : {name : 'receiver', value :params.value};
     setValues({ ...values, [name]: value });
     setResult({...result , 
-      error : !(values.receiver.length > 0 && values.content.length > 100), 
-      message : values.content.length <  100 ? '내용은 100자 이상 입력해주세요.' : values.receiver.length <= 0 ? '받는 사람을 선택해주세요.' : ''})
+      error : !(values.receiver.length > 0 && values.content.length > 100 && values.category.length > 0), 
+      message : values.content.length <  100 ? '내용은 100자 이상 입력해주세요.' : values.receiver.length <= 0 ? '받는 사람을 선택해주세요.' : values.category.length <=0 ? '카테고리를 선택해 주세요.' :''})
   }
+
   React.useEffect(() => {
     axios.get('/api/quarter/detail').then(({data}) => {
       if(data[0][0]) {
@@ -56,7 +61,7 @@ export default function Form(props) {
           });
         }
       }
-    });
+    }, []);
 
     try{
       axios.get('/api/emp/list')
@@ -78,66 +83,79 @@ export default function Form(props) {
         setValues({ ...values, 
           seq : data[0][0].SEQ,
           receiver : data[0][0].RECEIVER,
-          content : data[0][0].CONTENT
+          content : data[0][0].CONTENT,
+          category : data[0][0].CATEGORY
         })
       });
     }catch(err) {  }
+
+
+    try {
+      axios.get('/api/category/list').then(({data}) => {
+        setCategories(data[0])
+      })
+    }catch(err) {
+
+    }
   }, []);
 
   return (
-    <Box component="form" noValidate autoComplete="off">
-      <CardContent>
-        {/* 받는사람 입력 */}
-        <Autocomplete  disablePortal id="combo-box-demo" 
-          sx={{ m : 2 }} 
-          size="small"
-          options={employeeList} 
-          renderInput={(params) => {
-              if(values.seq > 0)  {
-                  employeeList.map((el, key) => {
-                    if(el.value == values.receiver)  params.inputProps.value = el.label
-                  });
-                }
-              return (<TextField fullWidth {...params} label="받는사람" required error={params.inputProps.value.length == 0}  onChange={handleChange} />)
-            }
-          }   
-           onChange={(e, params) => { handleChange(e, params)}}
-          />
-
-          {/* 내용입력 */}
+    <Box  component="form" noValidate autoComplete="off" p={0}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={2}>
+          <FormControl fullWidth error={values.category.length == 0} size={isMobile ? 'small' : 'medium'} >
+            <InputLabel id="demo-simple-select-label">카테고리* </InputLabel>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={values.category}
+              name="category"
+              label="카테고리 *"
+              onChange={handleChange} >
+              {categories.map((el, key) => {
+                return (<MenuItem name="category" value={el.KEY}>{el.VALUE}</MenuItem>);
+              })}
+          </Select>
+        </FormControl>
+        </Grid>
+        <Grid item xs={12} md={10}>
+          <Autocomplete  disablePortal id="combo-box-demo" 
+            options={employeeList} 
+            className={isMobile ? mobile.searchEl : classes.searchEl}
+            size={isMobile ? 'small' : 'medium'}
+            renderInput={(params) => {
+                if(values.seq > 0)  {
+                    employeeList.map((el, key) => {
+                      if(el.value == values.receiver)  params.inputProps.value = el.label
+                    });
+                  }
+                return (<TextField fullWidth className={isMobile ? mobile.searchEl : classes.searchEl} {...params} label="받는사람" size={isMobile ? 'small' : 'medium'} required error={params.inputProps.value.length == 0}  onChange={handleChange} />)
+              }
+            }   
+            onChange={(e, params) => { handleChange(e, params)}}
+            />
+        </Grid>
+        <Grid item xs={12}>
           <TextField fullWidth
-            multiline id="outlined-multiline-static" label="칭찬내용" placeholder="칭찬내용" rows={10} name="content"  required
-            helperText={`* ${result.message} [${values.content.length}자 입력 중]`} value={values.content}
-            error={values.content.length < 100}
-            sx={{ m : 2, mt : 0, width: '97%' , fontFamily: 'NanumSquare' }} 
-            onChange={handleChange} />
-      </CardContent>
+              multiline id="outlined-multiline-static" label="칭찬내용" placeholder="칭찬내용" rows={10} name="content"  required
+              helperText={`* ${result.message} [${values.content.length}자 입력 중]`} value={values.content} size={isMobile ? 'small' : 'medium'}
+              error={values.content.length < 100}
+              onChange={handleChange} />
+        </Grid>
+      </Grid>
       
       {/* 저장, 목록으로 가는 버튼 */}
-      <CardActions sx={{m : 2, float:'right', display : {xs:'none', md:'block'}}}>
-        <Button size="small" variant="contained" sx={{mr:1, fontFamily: 'NanumSquare'}} onClick={handleOpen}> 저장</Button>
-        <Link to="/view/list" style={{ textDecoration: 'none', color: 'white', fontFamily: 'NanumSquare' }}  >
-          <Button size="small" variant="outlined" to="/view/list">목록</Button>
-        </Link>
-      </CardActions>
-
-      <Box sx={{ display:{xs:'block', md:'none'}}}>
-        <Grid container spacing={0} sx={{position:'fixed', bottom:'0', left:'0'}}>
-          <Grid item xs={6}>
-            <Button variant='contained' color="error" size="large" to="/view/list" sx={style} onClick={handleOpen}  >저장</Button>
-          </Grid>
-          <Grid item xs={6}>
-          <Link to="/view/list" style={{ textDecoration: 'none', color: 'white', fontFamily: 'NanumSquare' }}  >
-            <Button variant='contained' color="info" size="large"  sx={style} to="/view/list">목록</Button>
+      <CardActions className={classes.formButton}>
+        <Grid container spacing={2} >
+          <Grid item xs={12}>
+          <Button size="large" variant="contained" color="error" sx={{mr:1}} onClick={handleOpen}>제출</Button>
+          <Link to="/view/list" className={classes.link}>
+            <Button size="large" variant="contained" color="info" to="/view/list">취소</Button>
           </Link>
           </Grid>
-
         </Grid>
-      </Box>
-        
-      {/* validation체크를 위한 모달창 띄우기 */}
+      </CardActions>
       <AlimPopup open={result.open} handleClose={handleClose} msg={result.message} error={result.error} url={result.url}/>
     </Box>
-        
   );
 }

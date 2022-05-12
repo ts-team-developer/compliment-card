@@ -75,7 +75,7 @@ class App extends Component {
                     }/>)
                   } 
                   ) : <LayoutMain onLogin={this.handleLogin} url='' loginStatus={this.props.status} onLogout={this.handleLogout} ></LayoutMain> }
-                <Route path={"*"} component={ErrorLayout}/>
+                {/* <Route path={"*"} component={ErrorLayout}/> */}
               </Switch>
               </Router>
       </React.Fragment>

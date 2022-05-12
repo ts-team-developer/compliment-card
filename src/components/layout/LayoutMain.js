@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
+import CssBaseline from "@material-ui/core/CssBaseline";
 import axios from 'axios';
-
 import { Box, Container } from '@mui/material';
 
 import { AlimPopup, ConfirmPopup } from '../modal/index';
-import { FormLayout, ListLayout, GradeListLayout, Status, Statistics, Setting  } from '../card/index'
+import { FormLayout, ListLayout, GradeListLayout, Status, StatisticsLayout, Setting  } from '../card/index'
 
 import { refreshRequest, logoutRequest } from '../../redux/actions/authentication'; 
 import { connect } from 'react-redux';
@@ -83,7 +83,7 @@ class LayoutMain extends Component {
                 }else if(this.props.url == '/view/status') {
                     return (<Status/>)
                 } else if(this.props.url=='/view/statistics') {
-                    return (<Statistics/>)
+                    return (<StatisticsLayout/>)
                 } else if(this.props.url=='/view/setting') {
                     return (<Setting/>)
                 }
@@ -92,17 +92,18 @@ class LayoutMain extends Component {
 
         return (
             <React.Fragment>
-            <ConfirmPopup open={this.state.open}  msg = {this.state.message}  handleClose={this.handleClose} handleCallback={this.handleCallback} />
-            <AlimPopup open={this.state.result.open} handleClose={this.handleClose} msg={this.state.result.message} error={this.state.result.error}/>
-            {this.props.loginStatus.login.status === "SUCCESS" ? this.props.children : null}
-            
-            <Container fixed >
-                <Box sx={{ bgcolor: 'none', height: '100vh', m:  { xs : '20px -5px', md: '7% -8%'} }}  >
-                    <Box component="form" noValidate  autoComplete="off"  > 
-                        {layoutMain()} 
+                <CssBaseline/>
+                <ConfirmPopup open={this.state.open}  msg = {this.state.message}  handleClose={this.handleClose} handleCallback={this.handleCallback} />
+                <AlimPopup open={this.state.result.open} handleClose={this.handleClose} msg={this.state.result.message} error={this.state.result.error}/>
+                {this.props.loginStatus.login.status === "SUCCESS" ? this.props.children : null}
+                
+                <Container fixed >
+                    <Box sx={{ bgcolor: 'none', height: '100vh' }}  >
+                        <Box component="form" noValidate  autoComplete="off" sx={{mt:'150px', pb : '50px'}} > 
+                            {layoutMain()} 
+                        </Box>
                     </Box>
-                </Box>
-            </Container>
+                </Container>
         </React.Fragment>
         );
     }

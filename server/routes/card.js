@@ -41,11 +41,13 @@ router.get('/list', async(req, res, next) => {
             } else {
                 if(cards == 5) {
                     sql += ` SELECT SEQ, QUARTER, SENDER, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER ) AS RECEIVER, REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SEND_DT, SEND_TM  `
+                    sql += `  ,  (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = CATEGORY) AS CATEGORY `
                     sql += ` FROM praise_card P `
                     sql += ` WHERE  sender NOT IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}')  and NOT EXISTS (SELECT 'x' FROM card_check C WHERE C.seq = P.seq AND NAME_KOR IN ('${req.user.loginUser.EMAIL}' ,'${req.user.loginUser.NAME_KOR}')) `
                     sql += `        AND QUARTER = '${quarterSql}'  `
                 } else if(cards == 4) {
                     sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER, c.READ_DT, c.READ_TM, (SELECT NAME_KOR FROM EMP WHERE EMAIL = p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, REPLACE(p.CONTENT, CHAR(10), '\n') AS CONTENT, SUM(c.evaluation) AS EVALUATION, SEND_DT, SEND_TM `
+                    sql += `   , (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = CATEGORY) AS CATEGORY `
                     sql += ` FROM  praise_card p, card_check c `
                     sql += ` WHERE p.seq=c.seq `
                     sql += (score > 0) ? ` AND c.evaluation = ${score}` : ` AND c.evaluation > 0 `;
@@ -53,15 +55,19 @@ router.get('/list', async(req, res, next) => {
                     sql += ` GROUP BY c.seq ORDER BY evaluation DESC `
                 } else if(cards == 3) {
                     sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER,  (SELECT NAME_KOR FROM EMP WHERE EMAIL= p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, REPLACE(P.CONTENT, CHAR(10), '\n') AS CONTENT, c.READ_DT, c.READ_TM, c.EVALUATION, SEND_DT, SEND_TM  `;
+                    sql += `   , (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = CATEGORY) AS CATEGORY `
                     sql += ` FROM praise_card p LEFT OUTER JOIN card_check c ON p.seq=c.seq AND c.name_kor IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') `;
                     sql += ` WHERE p.quarter='${quarterSql}' `
                     sql +=  (score > 0) ? ` AND c.evaluation = ${score}` : ``;
                 } else if( cards == 2) {
                     sql += ` SELECT p.SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,SENDER, REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT , READ_DT, READ_TM  `
+                    sql += `   , (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = CATEGORY) AS CATEGORY `
                     sql += ` FROM   praise_card p right join card_check c on p.seq = c.seq  `;
                     sql += ` WHERE  RECEIVER IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') AND NAME_KOR IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') AND QUARTER ='${quarterSql}'  `;
                 }  else if(cards == 1) {
-                    sql += ` SELECT SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SENDER, SEND_DT, SEND_TM FROM praise_card p WHERE SENDER IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') AND QUARTER ='${quarterSql}' `
+                    sql += ` SELECT SEQ, (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER) AS RECEIVER ,REPLACE(CONTENT, CHAR(10), '\n') AS CONTENT, SENDER, SEND_DT, SEND_TM  `
+                    sql += `   , (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = CATEGORY) AS CATEGORY ` ;
+                    sql += ` FROM praise_card p WHERE SENDER IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') AND QUARTER ='${quarterSql}' `;
                 }
     
                 const data = await connection.query(sql);
@@ -104,7 +110,7 @@ router.get('/detail', async(req, res, next) => {
             return ;
         } else {
             let connection = await pool.getConnection(async conn => conn)
-            let sql = ` SELECT A.SEQ, A.QUARTER, A.SENDER, A.RECEIVER, A.SEND_DT,A.SEND_TM, REPLACE(A. CONTENT, CHAR(10), '\n') AS CONTENT `
+            let sql = ` SELECT A.SEQ, A.QUARTER, A.SENDER, A.RECEIVER, A.SEND_DT,A.SEND_TM, CATEGORY, REPLACE(A. CONTENT, CHAR(10), '\n') AS CONTENT `
             sql += ` FROM praise_card A WHERE SEQ = ${req.query.seq}`
             const data = await connection.query(sql)
             connection.release();
@@ -119,7 +125,7 @@ router.get('/detail', async(req, res, next) => {
 // 칭찬카드 등록
 router.post('/save', async(req, res, next) => {
     let connection = await pool.getConnection(async conn => conn)
-    const {receiver, content, seq} = req.body;
+    const {receiver, content, seq, category} = req.body;
     const detailCard = await connection.query(`SELECT * FROM praise_card WHERE SEQ = ${seq}`);
     const oriReceiver = seq > 0 ? detailCard[0][0].receiver : receiver;
 
@@ -176,14 +182,18 @@ router.post('/save', async(req, res, next) => {
             res.status(400).send({message:"존재하지 않는 직원입니다. "});
             connection.release();
             return ;
-        } else  {
+        } else if (category == '') {
+            res.status(400).send({message:" 카테고리를 선택해주세요. "})
+            connection.release();
+            return ;
+        } else {
             //등록쿼리
             let sql =""
             if(seq == 0) {
-                sql += `INSERT INTO praise_card (QUARTER, RECEIVER, SENDER, SEND_DT, SEND_TM, CONTENT)   `;
-                sql += `  VALUES ('${req.user.quarterInfo.QUARTER}', '${receiver}', '${req.user.loginUser.EMAIL}', DATE_FORMAT(NOW(), '%Y-%m-%d'), DATE_FORMAT(NOW(), '%H:%i:%s'), '${content}')`;
+                sql += `INSERT INTO praise_card (QUARTER, RECEIVER, SENDER, CATEGORY, SEND_DT, SEND_TM, CONTENT)   `;
+                sql += `  VALUES ('${req.user.quarterInfo.QUARTER}', '${receiver}', '${req.user.loginUser.EMAIL}', '${category}' ,DATE_FORMAT(NOW(), '%Y-%m-%d'), DATE_FORMAT(NOW(), '%H:%i:%s'), '${content}')`;
             } else {
-                sql += ` UPDATE praise_card SET RECEIVER = '${receiver}' , SEND_DT = DATE_FORMAT(NOW(), '%Y-%m-%d'), SEND_TM=DATE_FORMAT(NOW(), '%H:%i:%s'), CONTENT='${content}'`;
+                sql += ` UPDATE praise_card SET RECEIVER = '${receiver}' , SEND_DT = DATE_FORMAT(NOW(), '%Y-%m-%d'), SEND_TM=DATE_FORMAT(NOW(), '%H:%i:%s'), CATEGORY = '${category}' , CONTENT='${content}'`;
                 sql += `  WHERE SEQ =  ${seq} AND SENDER = '${req.user.loginUser.EMAIL}' `;
             }
                 

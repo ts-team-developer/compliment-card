@@ -25,6 +25,7 @@ router.get('/list', async(req, res, next) => {
     try{
             // cards : 5 - 안 읽은 카드, 4 - 추천카드(o), 3 - 전체카드(o) , 2 - 받은 카드 1-  내가쓴카드
             const {cards, score, quarter} = req.query;
+            console.log(cards)
             let connection = await pool.getConnection(async conn => conn);
             let sql = ``;
             let quarterSql = ``;
@@ -55,7 +56,7 @@ router.get('/list', async(req, res, next) => {
                     sql += ` GROUP BY c.seq ORDER BY evaluation DESC `
                 } else if(cards == 3) {
                     sql += ` SELECT p.SEQ, p.QUARTER, p.SENDER,  (SELECT NAME_KOR FROM EMP WHERE EMAIL= p.RECEIVER OR NAME_KOR = p.RECEIVER) AS RECEIVER, REPLACE(P.CONTENT, CHAR(10), '\n') AS CONTENT, c.READ_DT, c.READ_TM, c.EVALUATION, SEND_DT, SEND_TM  `;
-                    sql += `   , (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = CATEGORY) AS CATEGORY `
+                    sql += `   , (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = CATEGORY) AS CATEGORY, p.SEND_DT, p.SEND_TM, IFNULL(c.READ_DT, '') AS READ_DT, IFNULL(c.READ_TM, '') AS READ_TM `
                     sql += ` FROM praise_card p LEFT OUTER JOIN card_check c ON p.seq=c.seq AND c.name_kor IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') `;
                     sql += ` WHERE p.quarter='${quarterSql}' `
                     sql +=  (score > 0) ? ` AND c.evaluation = ${score}` : ``;
@@ -154,8 +155,8 @@ router.post('/save', async(req, res, next) => {
         } else if (req.user.quarterInfo.ISCLOSED != 'N') {
             res.status(400).send({message:"칭찬카드 작성 기간이 아닙니다. "})
             return ;
-        } else if(content.length < 100) {
-            res.status(400).send({message:"칭찬 내용은 100자 이상 작성해주세요. "})
+        } else if(content.length < 30) {
+            res.status(400).send({message:"칭찬 내용은 30자 이상 작성해주세요. "})
             connection.release();
             return ;
         } else if (receiver == '') {
@@ -209,7 +210,6 @@ router.post('/save', async(req, res, next) => {
     }
 });
 
-
 router.get('/bestcard', async(req, res, next) => {
     try{
         if(req.user === undefined) {
@@ -220,33 +220,83 @@ router.get('/bestcard', async(req, res, next) => {
             return ;
         } else {
             let connection = await pool.getConnection(async conn => conn)
-            let sql = " SELECT B.SEQ, B.RECEIVER AS BSET_RECEIVER, B.CONTENT AS BSET_CONTENT, A.QUARTER AS BSET_QUARTER  "
-            sql += "   FROM (  ";
-            sql += " 	        SELECT  QUARTER, MAX(EVALUATION) AS EVALUATION ";
-            sql += "            FROM ( ";
-            sql += "                 SELECT p.quarter AS QUARTER, SUM(c.evaluation) AS EVALUATION  ";
-            sql += "                     FROM card_check c , praise_card p";
-            sql += "                    WHERE c.evaluation > 0  ";
-            sql += "                      AND c.seq = p.seq ";
-            sql += "                    GROUP BY p.quarter,c.seq                  ) X  ";
-            sql += "           GROUP BY QUARTER         ) A,  ";
-            sql += "        ( ";
-            sql += "            SELECT p.seq AS SEQ, p.quarter AS QUARTER, p.receiver AS RECEIVER, p.content AS CONTENT, SUM(c.evaluation) AS EVALUATION ";
-            sql += "              FROM card_check  c, praise_card p    ";
-            sql += "             WHERE c.evaluation > 0 AND c.seq = p.seq   ";
-            sql += "             GROUP BY p.quarter,c.seq ) B, ";
-            sql += "        (  SELECT quarter FROM closed WHERE isClosed = 'Y'  AND isRecClosed = 'Y' ) C  ";
-            sql += "              WHERE A.EVALUATION = B.EVALUATION  AND A.QUARTER = B.QUARTER AND C.QUARTER = A.QUARTER  AND C.QUARTER = B.QUARTER "
-            sql += "              ORDER BY A.QUARTER DESC ";
-            const data = await connection.query(sql);
+
+            sql = ` SELECT B.SEQ,A.QUARTER AS QUARTER  ,B.CONTENT AS CONTENT, B.RECEIVER AS RECEIVER , '' AS CATEGORY  `;
+            sql += `   FROM (  `;
+            sql += ` 	        SELECT  QUARTER, MAX(EVALUATION) AS EVALUATION `;
+            sql += `            FROM ( `;
+            sql += `                 SELECT p.quarter AS QUARTER, SUM(c.evaluation) AS EVALUATION  `;
+            sql += `                     FROM card_check c , praise_card p `;
+            sql += `                    WHERE c.evaluation > 0  `;
+            sql += `                      AND c.seq = p.seq `;
+            sql += `                    GROUP BY p.quarter,c.seq                  ) X  `;
+            sql += `           GROUP BY QUARTER         ) A,  `;
+            sql += `        ( `;
+            sql += `            SELECT p.seq AS SEQ, p.quarter AS QUARTER, p.receiver AS RECEIVER, p.content AS CONTENT, SUM(c.evaluation) AS EVALUATION `;
+            sql += `              FROM card_check  c, praise_card p    `;
+            sql += `             WHERE c.evaluation > 0 AND c.seq = p.seq   `;
+            sql += `             GROUP BY p.quarter,c.seq ) B, `;
+            sql += `        (  SELECT quarter FROM closed WHERE isClosed = 'Y'  AND isRecClosed = 'Y' ) C  `
+            sql += `              WHERE A.EVALUATION = B.EVALUATION  AND A.QUARTER = B.QUARTER AND C.QUARTER = A.QUARTER  AND C.QUARTER = B.QUARTER `
+            sql += ` UNION ALL `
+            sql += ` SELECT SEQ, QUARTER, CONTENT, `;
+            sql += ` (SELECT NAME_KOR FROM EMP WHERE EMAIL= RECEIVER ) AS RECEIVER ,  `
+            sql += ` (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = C.CATEGORY) AS CATEGORY  `
+            sql += `      FROM ( `;
+            sql += `        SELECT * , COUNT(*) AS COUNT `;
+            sql += `        FROM PRAISE_CARD PC  `;
+            sql += `        WHERE CATEGORY IS NOT NULL  `;
+            sql += `        GROUP BY QUARTER , CATEGORY , RECEIVER  `;
+            sql += `      ) C INNER JOIN ( `;
+            sql += `        SELECT MAX(COUNT) AS BEST ,CATEGORY`;
+            sql += `        FROM ( `;
+            sql += `            SELECT *, COUNT(*) AS COUNT `;
+            sql += `            FROM PRAISE_CARD PC  `;
+            sql += `            WHERE CATEGORY IS NOT NULL `;
+            sql += `            GROUP BY  QUARTER , CATEGORY , RECEIVER `
+            sql += `      ) E   	`;
+            sql += `    GROUP BY CATEGORY 	`;
+            sql += `    ) D ON C.COUNT = D.BEST AND C.CATEGORY = D.CATEGORY `;
+
+            const list = (req.user.loginUser.AUTH == 'ADM' || (req.user.quarterInfo.ISCLOSED == "Y" && req.user.quarterInfo.ISCRECLOSED == "Y") ) ? await connection.query(sql) : null;
+
             connection.release();
-            return res.json(data)
+            return res.json(list[0])
         }
-    }catch{
+    }catch (error){
+        console.log(error)
         return res.status(500).json()
     }
 });
 
+router.post('/evaluation', async(req, res, next) => {
+    try{
+        // 자신이 추천한 카드는 추천할 수 없습니다.
+        let connection = await pool.getConnection(async conn => conn)
+        const cards = await connection.query(`SELECT * FROM praise_card WHERE SEQ =  ${req.body.seq}`);
+        if(req.user === undefined) {
+            res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+            return ;
+        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+            res.status(403).send({message : '잘못된 접근입니다. '});
+            return ;
+        } else if(cards[0][0].sender == req.user.email) {
+            connection.release();
+            res.status(400).send({message:"자신이 칭찬한 카드는 추천할 수 없습니다."})
+            return ;
+        } else {
+            let sql = `INSERT INTO card_check (SEQ, NAME_KOR, READ_DT, READ_TM, REC_FLAG, EVALUATION)   `;
+            sql += `  VALUES ('${req.body.seq}', '${req.user.loginUser.EMAIL}', DATE_FORMAT(NOW(), '%Y-%m-%d'), DATE_FORMAT(NOW(), '%H%i%s'), 'N', '${req.body.evaluation}')  `
+            sql += ` ON DUPLICATE KEY UPDATE SEQ =  '${req.body.seq}', NAME_KOR ='${req.user.loginUser.EMAIL}', READ_DT = DATE_FORMAT(NOW(), '%Y-%m-%d'), READ_TM = DATE_FORMAT(NOW(), '%H%i%s'), EVALUATION = '${req.body.evaluation}' `
+            const data = await connection.query(sql);
+            connection.release();
+            res.send({message : "정상 처리 되었습니다.", data : data});
+        }
+    }catch (err){
+        console.log(err)
+        return res.status(500).json(err)
+    }
+});
 
 
 router.post('/delete', async(req, res, next) => {

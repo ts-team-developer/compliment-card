@@ -19,7 +19,7 @@ export default function List(props) {
   // 마감 : quarter : cardes : 안읽은 카드(5) 혹은 전체 카드
   const info = useSelector(state => state.authentication.status);
 
-  const [searchForm, setSearchForm] = React.useState({ quarter : info.quarterInfo.QUARTER, cards : info.quarterInfo.ISCLOSED == 'N' ? '1' : '5' });
+  const [searchForm, setSearchForm] = React.useState({ quarter : info.quarterInfo.QUARTER, cards : info.quarterInfo.ISCLOSED == 'N' ? '1' : '3' });
   const [result, setResult] = React.useState({error : true, message : '', open : false});
 
   const [posts, setPosts] = React.useState([]);
@@ -29,11 +29,11 @@ export default function List(props) {
   
   React.useEffect(() => {
     const fetchPosts = async () => {
-      if(searchForm.quarter == info.quarterInfo.QUARTER && info.quarterInfo.ISCLOSED == 'N' && searchForm.cards != '1') {
-        setResult({ ...result, open : true, error :true, message : '작성 마감이 되면 해당 분기 카드를 조회할 수 있습니다.' , url : '' })
-        setSearchForm({ ...searchForm, cards: '1', quarter : info.quarterInfo.QUARTER });
-        return false;
-      }
+      // if(searchForm.quarter == info.quarterInfo.QUARTER && info.quarterInfo.ISCLOSED == 'N' && searchForm.cards != '1') {
+      //   setResult({ ...result, open : true, error :true, message : '작성 마감이 되면 해당 분기 카드를 조회할 수 있습니다.' , url : '' })
+      //   setSearchForm({ ...searchForm, cards: '1', quarter : info.quarterInfo.QUARTER });
+      //   return false;
+      // }
 
       axios.get('/api/card/list', {params: searchForm})
       .then(async (data) => {
@@ -93,8 +93,8 @@ export default function List(props) {
                 <InputLabel id="demo-simple-select-label">카드</InputLabel>
                 <Select labelId="demo-simple-select-label" id="demo-simple-select" className={isMobile ? mobile.searchEl : classes.searchEl}  name="cards" label="카드"  size="small" value={searchForm.cards}  
                   onChange={handleChange}>
-                  <MenuItem value={5}>안 읽은 카드</MenuItem>
-                  <MenuItem value={4}>추천카드</MenuItem>
+                  {/* <MenuItem value={5}>안 읽은 카드</MenuItem> */}
+                  {/* <MenuItem value={4}>추천카드</MenuItem> */}
                   <MenuItem value={3}>전체카드</MenuItem>
                   <MenuItem value={2}>받은카드</MenuItem>
                   <MenuItem value={1}>내가쓴카드</MenuItem>

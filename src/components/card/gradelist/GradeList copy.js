@@ -20,19 +20,18 @@ export default function GradeList(props) {
       color = deepOrange[500]
   } else if(props.list.CATEGORY == '약속') {
       color = green[500];
-  } 
+  }
 
   return (
     <React.Fragment>
-      {/* <Grid item xs={12} md={ props.list.QUARTER.split('년도')[0] >= 2022 ? 6 : 12}> */}
-      <Grid item xs={12} md={6}>
-      <Card variant="outlined" severity="success" key={props.SEQ} className={classes.p0} >    
-        <CardHeader  avatar={  <Avatar sx={{ bgcolor: color , fontSize : '1rem' }} aria-label="recipe">{props.list.CATEGORY == '' ? ':)' : props.list.CATEGORY }</Avatar> }
-             title={props.list.RECEIVER} 
-             subheader={props.list.QUARTER}/>
-          <CardContent>
-            <Typography variant="body2" color="text.secondary" sx = {{textOverflow : 'ellipsis', overflow : 'hidden', wordBreak : 'break-word'}}>
-              {props.list.CONTENT.split('\n').map((line) => { return (<p>{line}</p>)  })  } 
+      <Grid item xs={12} md={3}>
+        <Card variant="outlined" severity="success" key={props.seq} className={classes.p0} >    
+        <CardHeader  avatar={  <Avatar sx={{ bgcolor: color, fontSize : '1rem' }} aria-label="recipe"> {props.list.CATEGORY ? props.list.CATEGORY : '-'} </Avatar> }
+             title={props.list.BEST_RECEIVER} 
+             subheader={props.list.BEST_QUARTER} />
+        <CardContent>
+            <Typography variant="body2" color="text.secondary">
+              {props.list.BEST_CONTENT.split('\n').map((line) => { return (<p>{line}</p>)  })  } 
             </Typography>
           </CardContent>
         </Card>

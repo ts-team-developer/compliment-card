@@ -67,7 +67,7 @@ export default function FormLayout () {
             <Card variant="outlined" className={isMobile ? mobile.card : classes.card}  >
                 {/* Card Header */}
                 <CardMedia sx={{padding: '10px'}}>
-                    <Typography variant="h5" component="div" className={classes.titleb0} >
+                    <Typography variant="h5" component="div"  className={classes.title}  >
                        <b>통계</b> 
                     </Typography>
                     
@@ -78,7 +78,7 @@ export default function FormLayout () {
                         indicatorColor="primary"
                         aria-label="full width tabs example" >
                         <Tab label="년도별 통계" {...a11yProps(0)}  />
-                        <Tab label="직원별 통계" {...a11yProps(1)} />
+                        <Tab label="직원별 받은 카드 조회" {...a11yProps(1)} />
                         <Tab label="점수별 통계" {...a11yProps(2)} />
                     </Tabs>
                 </CardContent>

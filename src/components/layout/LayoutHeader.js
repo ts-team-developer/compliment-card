@@ -12,7 +12,6 @@ import { usePcStyles, useMobileStyles  } from "../../styles/styles"
 import { useMediaQuery} from "@material-ui/core";
 
 
-
 const LayoutHeader = (props) => {
   // Style 관련 CSS
   const isMobile = useMediaQuery("(max-width: 600px)");
@@ -21,9 +20,8 @@ const LayoutHeader = (props) => {
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const info = useSelector(state => state.authentication.status);
-  const dispatch = useDispatch();
 
-  const bannerMsg = ((info.quarterInfo.ISCLOSED == 'N') ?  ' 칭찬카드 작성기간입니다.' : '');
+  const bannerMsg = ((info.quarterInfo.ISCLOSED == 'N') ?  ' 칭찬카드 작성기간입니다.' : (info.quarterInfo.ISRECCLOSED == 'N') ? '칭찬카드 작성이 마감되었습니다.' : '칭찬카드 오픈 예정입니다.');
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -33,30 +31,28 @@ const LayoutHeader = (props) => {
     setAnchorElNav(null);
   };
 
-  const handleClose = () => {
-    dispatch(alertHidden());
-  }
-
   return (
     <AppBar position="fixed" color="info" >
       <CssBaseline />
+      {(info.show == true) && 
       <Box sx={{ flexGrow: 1 }} >
         <Stack fullWidth spacing={4}>
           {/* Top Banner 칭찬카드 작성/추천 기간 동안 뜨는 팝업*/}
           <Collapse in={info.show}>
             <Alert severity="warning" 
               action={
-              <IconButton aria-label="close" color="inherit" size="small" onClick={handleClose} >
+              <IconButton aria-label="close" color="inherit" size="small" onClick={props.onClose} >
                 <CloseIcon fontSize="inherit" />
               </IconButton> }>
-              <AlertTitle className={isMobile ? classes.mobileTopBanner : classes.pcTopBanner}> 
-                <strong> {info.quarterInfo.QUARTER}</strong> 
-                {bannerMsg}
-              </AlertTitle>
+              
+                <AlertTitle className={isMobile ? classes.mobileTopBanner : classes.pcTopBanner}> 
+                  <strong> {info.quarterInfo.QUARTER}</strong> 
+                  {bannerMsg}
+                </AlertTitle>  
             </Alert>
           </Collapse>
         </Stack>
-      </Box>
+      </Box> }
       <Box>
         <Toolbar disableGutters>
           {/*  모바일 */}
@@ -105,7 +101,7 @@ const LayoutHeader = (props) => {
             component="div"
             sx={{ flexGrow: 1, pl : '10px' }}
             className={classes.mobileHeader} >
-            칭찬카드
+            <b>칭찬카드</b>
           </Typography>
           <Box sx={{ flexGrow: 1 , ml : '20px'}} >
             {props.menuList.map((menu) => (

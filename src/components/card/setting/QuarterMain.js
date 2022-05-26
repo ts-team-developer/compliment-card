@@ -1,14 +1,14 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import axios from 'axios';
-import { CssBaseline, Button,  InputLabel, FormControl, Select, MenuItem,Grid, TextField }  from '@mui/material';
+import { CssBaseline, InputLabel, FormControl, Select, MenuItem,Grid, TextField }  from '@mui/material';
 import QuarterList from './QuarterList';
-import QuarterPopup from '../../modal/QuarterPopup';
+import { useSelector, useDispatch } from 'react-redux';
+
 
 export default function WorkerMain() {
   const [searchForm, setSearchForm] = React.useState({'year' : 0, 'quarter' : 0, });
   const [yearList, setYearList] = React.useState([]);
-  const [open, setOpen] = React.useState(false);
+  const info = useSelector(state => state.authentication.status);
 
   const handleChanges =(event) => {
     const{name, value} = event.target;
@@ -17,11 +17,6 @@ export default function WorkerMain() {
       [name] : value
     })
   }
-  const handleOpen = () => {
-    setOpen(true);
-  }
-
-  const handleClose = () => setOpen(false);
 
   React.useEffect(() => {
     const fetchYear = async () => {
@@ -31,7 +26,7 @@ export default function WorkerMain() {
       });
     };
     fetchYear();
-  }, [searchForm]);
+  }, [searchForm, info]);
  
   return (
     <React.Fragment>
@@ -58,15 +53,8 @@ export default function WorkerMain() {
                         />
           </FormControl>
         </Grid>
- 
-            <Grid item xs={12} md={8} sx={{textAlign : 'right'}}>
-            <FormControl   >
-              <Button size="medium" color="warning" name="add" variant="contained" onClick={handleOpen}>분기추가</Button>
-            </FormControl>
-            </Grid>
           </Grid>
           <QuarterList searchForm={searchForm} />
-          <QuarterPopup open={open} handleClose={handleClose}  isAdd={true} />
     </React.Fragment>
   );
 }

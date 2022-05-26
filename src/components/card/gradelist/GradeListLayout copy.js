@@ -55,7 +55,7 @@ export default function FixedContainer() {
     const fetchPosts = async () => {
       axios.get('/api/card/bestcard')
       .then(({data}) => {
-        setPosts(data);
+        setPosts(data[0]);
       });
     }
     const fetchQuarter = async () => {
@@ -79,11 +79,11 @@ export default function FixedContainer() {
                         </AccordionSummary>
                         <AccordionDetails>
                             <Typography>
-                            <Grid container spacing={2}>
-                            {posts && posts.map((el1, key) => {
-                                  return (quarters.quarter == el1.QUARTER) ?
-                                          <GradeList list = {el1}/>  : null  } ) }
-                            </Grid>
+                                    <Grid container spacing={2}>
+                                    {posts && posts.map((el1, key) => {
+                                        return (quarters.quarter === el1.BEST_QUARTER) ?
+                                            <GradeList list = {el1}/>  : null  } ) }
+                                    </Grid>
                             </Typography>
                         </AccordionDetails>
                     </Accordion>

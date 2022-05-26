@@ -34,10 +34,7 @@ export default function ListLayout() {
                         <Typography variant="subtitle2" className={classes.descriptions}>
                             본인이 작성한 카드는 본인을 제외한 전 직원이 오점 척도로 평가하여 본인에게만 피드백을 드릴테니, 다른 칭찬카드 작성 시에 분발해주세요. <br/>
                         </Typography>
-
-                        <Typography variant="subtitle2" className={classes.descriptions}>
-                            시험적으로 5점 척도를 사용합니다. 더 좋은 방안을 찾는 중이니 성실하게 평가해주십시오.<br/>
-                        </Typography>
+                        
                     </CardMedia>
 
                     {/* Card Content */}

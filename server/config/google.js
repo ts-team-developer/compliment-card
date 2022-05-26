@@ -30,14 +30,14 @@ const strategy = new GoogleStrategy(
     passReqToCallback   : true
   }, async function(request, accessToken, refreshToken, profile, done){
       try{
-        let queryString =  ` SELECT '${profile.id}' AS UID, '${accessToken}' AS ACCESS_TOKEN, NAME_KOR, EMAIL, WORK_STS `;
+        let queryString =  ` SELECT '${profile.id}' AS UID, '${accessToken}' AS ACCESS_TOKEN, NAME_KOR, EMAIL, WORK_STS, AUTH `;
             queryString += ` FROM EMP WHERE EMAIL = '${profile.emails[0].value}' `;
 
         let connection = await pool.getConnection(async conn => conn);
         const data = await connection.query(queryString);
         connection.release();
         if(data[0][0].WORK_STS == "1") {
-          return done(null, {'loginUser' : data[0][0], 'REFRESH_TOKEN' : refreshToken, 'request_token' : accessToken, 'photo' : profile.photos[0].value });
+          return done(null, {'loginUser' : data[0][0], 'REFRESH_TOKEN' : refreshToken, 'request_token' : accessToken, 'photo' : profile.photos[0].value, show : true, isAutoLogout : false });
         }else {
           return done('fail', null)
         }

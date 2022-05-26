@@ -23,13 +23,11 @@ pool.getConnection((err, connection) => {
 
 module.exports = () => {
   passport.serializeUser(function(user, done) {
-    console.log(`serializeUser` )
     done(null, user);
   });
   
   // 매개변수 user는 req.session.passport에 저장된 값
   passport.deserializeUser(async function(user, done) {
-    console.log(`deserializeUser `)
     let connection = await pool.getConnection(async conn => conn)
     const data = await connection.query("SELECT QUARTER, ISCLOSED, ISRECCLOSED FROM CLOSED  ORDER BY QUARTER DESC LIMIT 0, 1 ");
     

@@ -4,12 +4,12 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const cookieParser  = require('cookie-parser');
-const port = process.env.PORT || 3001;
 const passport = require('passport');
 const path = require('path');
 const passportConfig = require('./config/passport')
 require('dotenv').config();
 
+const port = process.env.PORT;
 
 app.use(cookieParser());
 app.use("/view",express.static(path.join(__dirname, '..', 'build')));
@@ -48,7 +48,6 @@ app.use('/auth', require('./routes/login'));
 
 
 app.get("/view/*", function (req, res) {
-    console.log(`/view/* : ${req.user}`)
     if(req.user === undefined) {
         res.redirect('/auth/login/google');
     } else {

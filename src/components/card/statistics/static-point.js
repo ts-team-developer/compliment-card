@@ -9,9 +9,10 @@ import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 export default function FixedContainer() {
   const columns = [
     // { field: 'idx', headerName: '순서', width: 90 },
-    { field: 'QUARTER', headerName: '년도', width: 200,},
-    { field: 'SENDER', headerName: '작성자', width: 200,},
-    { field: 'SUM', headerName: '점수', width: 300,}
+    { field: 'QUARTER', headerName: '년도', width: 160,},
+    { field: 'SENDER', headerName: '작성자', width: 130,},
+    { field: 'SUM', headerName: '점수', width: 100},
+    { field: 'CONTENT', headerName: '내용', width: 1000}
   ];
 
   const info = useSelector(state => state.authentication.status);
@@ -22,7 +23,7 @@ export default function FixedContainer() {
 
   const [searchForm, setSearchForm] = React.useState({ quarter : (info.quarterInfo.QUARTER).substr(0,7) });
 
-  const quarterList= ['1분기','2분기','3분기','4분기'];
+  const quarterList= ['1분기','2분기','3분기','4분기', '1기', '2기'];
   const yearList= [];
 
    axios.get('/api/quarter/listOfYear' , {params: { sort : 'Y' }})
@@ -34,7 +35,6 @@ export default function FixedContainer() {
 
 
   React.useEffect( () => {
-      
     axios.get('/api/statistics/point', {params : searchForm})
     .then(({data}) => {
         try{

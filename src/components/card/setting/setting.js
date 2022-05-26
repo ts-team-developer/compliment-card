@@ -61,7 +61,7 @@ export default function FormLayout () {
             <Card variant="outlined" className={isMobile ? mobile.card : classes.card}  >
                 {/* Card Header */}
                 <CardMedia sx={{padding: '10px'}}>
-                    <Typography variant="h5" component="div" className={classes.titleb0} >
+                    <Typography variant="h5" component="div"  className={classes.title} >
                        <b>관리</b> 
                     </Typography>
                     

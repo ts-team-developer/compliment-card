@@ -2,8 +2,8 @@ import * as React from 'react';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import CssBaseline from '@mui/material/CssBaseline';
-import { FormControl, Grid, Box, Container, Card, Button, Typography,TextField  } from '@mui/material';
-import { DataGrid, gridColumnsSelector }  from '@mui/x-data-grid';
+import { FormControl, Grid, Button, TextField  } from '@mui/material';
+import { DataGrid }  from '@mui/x-data-grid';
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 
 
@@ -11,11 +11,12 @@ export default function FixedContainer() {
 
   const columns = [
     // { field: 'idx', headerName: '순서', width: 90 },
-    { field: 'QUARTER', headerName: '분기', width: 150,},
-    { field: 'SEND_DT', headerName: '날짜', width: 150,},
-    { field: 'RECEIVER', headerName: '받은 사람', width: 120 },
-    { field: 'SENDER', headerName: '작성한 사람', width: 150 },
-    { field: 'CONTENT', headerName: '칭찬 내용', width: 400,}
+    { field: 'QUARTER', headerName: '분기', width: 100,},
+    { field: 'SEND_DT', headerName: '날짜', width: 100,},
+    { field: 'RECEIVER', headerName: '받은 사람', width: 80 },
+    { field: 'CATEGORY', headerName: '카테고리', width: 80,},
+    { field: 'SENDER', headerName: '작성한 사람', width: 80 },
+    { field: 'CONTENT', headerName: '칭찬 내용', width: 1000,},
   ];
 
   const info = useSelector(state => state.authentication.status);
@@ -23,7 +24,7 @@ export default function FixedContainer() {
   const [rows, setRowList] = React.useState([]);
   const [value, setValue] = React.useState(info.quarterInfo.QUARTER);
   const [inputValue, setInputValue] = React.useState('');
-  const [searchForm, setSearchForm] = React.useState({ quarter : info.quarterInfo.QUARTER });
+  const [searchForm, setSearchForm] = React.useState({ quarter : info.quarterInfo.QUARTER, receiver : '' });
   const quarterList= [];
   const nameList = []
    axios.get('/api/quarter/list', {params: { sort : 'Y' }})
@@ -51,7 +52,7 @@ export default function FixedContainer() {
   },[info, value, searchForm]);
 
   const handleClick = () => {
-    setSearchForm({quarter:value.label, receiver:inputValue})
+    setSearchForm({...searchForm, quarter:value.label, receiver:inputValue})
   }
 
   return (

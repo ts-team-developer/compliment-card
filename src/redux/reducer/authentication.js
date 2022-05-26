@@ -13,7 +13,8 @@ const initialState = {
         isLoggedIn: false,
         currentUser : null,
         quarterInfo : null,
-        show : true
+        show : true,
+        result : false
     }
 };
 
@@ -39,7 +40,6 @@ export default function authentication(state, action) {
                 ...state,
                 login : {
                     status : 'SUCCESS',
-                    isAutoLogout : false,
                     isLoggedIn : true
                 },
                 status : {
@@ -47,7 +47,8 @@ export default function authentication(state, action) {
                     isLoggedIn : true,
                     currentUser : action.user.loginUser,
                     quarterInfo : action.user.quarterInfo,
-                    show : !(action.user.quarterInfo.ISCLOSED == 'Y' && action.user.quarterInfo.ISRECCLOSED == 'Y')
+                    show : action.user.show,
+                    result: false
                 }
             }
         
@@ -64,14 +65,14 @@ export default function authentication(state, action) {
                 ...state,
                 login : {
                     ...state.login,
-                    isAutoLogout : false
                 },
                 status : {
                     ...state.status,
                     currentUser : {
                         ...state.status.currentUser,
-                        ACCESS_TOKEN : action.token
-                    }
+                        ACCESS_TOKEN : action.token,
+                    },
+                    result : false
                 }
             }
 
@@ -81,7 +82,8 @@ export default function authentication(state, action) {
                     login : {
                         ...state.login,
                         isAutoLogout : true,
-                    }
+                    },
+                    result : true
                 }
 
         case types.ALERT_STATUS :
@@ -92,8 +94,17 @@ export default function authentication(state, action) {
                     show : false 
                 }
             }
+            case types.QUARTER_STATUS_SUCCESS :
+                return {
+                    ...state,
+                    status : {
+                        ...state.status,
+                        show : action.data.show,
+                        quarterInfo : action.data.quarterInfo,
+                    }
+                }
 
         default : 
             return state;
     }
-}
+} 

@@ -20,33 +20,7 @@ pool.getConnection((err, connection) => {
       if (connection) return connection.release();
 });
 
-router.post('/save', async(req, res, next) => {
-    try{
-        // 자신이 추천한 카드는 추천할 수 없습니다.
-        let connection = await pool.getConnection(async conn => conn)
-        const cards = await connection.query(`SELECT * FROM praise_card WHERE SEQ =  ${req.body.seq}`);
-        if(req.user === undefined) {
-            res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
-            return ;
-        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
-            res.status(403).send({message : '잘못된 접근입니다. '});
-            return ;
-        } else if(cards[0][0].sender == req.user.email) {
-            connection.release();
-            res.status(400).send({message:"자신이 칭찬한 카드는 추천할 수 없습니다."})
-            return ;
-        } else {
-            let sql = `INSERT INTO card_check (SEQ, NAME_KOR, READ_DT, READ_TM, REC_FLAG, EVALUATION)   `;
-            sql += `  VALUES ('${req.body.seq}', '${req.user.email}', DATE_FORMAT(NOW(), '%Y-%m-%d'), DATE_FORMAT(NOW(), '%H%i%s'), 'N', '${req.body.evaluation}')  `
-            sql += ` ON DUPLICATE KEY UPDATE SEQ =  '${req.body.seq}', NAME_KOR ='${req.user.email}', READ_DT = DATE_FORMAT(NOW(), '%Y-%m-%d'), READ_TM = DATE_FORMAT(NOW(), '%H%i%s'), EVALUATION = '${req.body.evaluation}' `
-            const data = await connection.query(sql)
-            connection.release();
-            return res.json(data)
-        }
-    }catch{
-        return res.status(500).json(err)
-    }
-});
+
 
 
 router.get('/list', async(req, res, next) => {

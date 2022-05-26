@@ -21,7 +21,7 @@ const LayoutHeader = (props) => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const info = useSelector(state => state.authentication.status);
 
-  const bannerMsg = ((info.quarterInfo.ISCLOSED == 'N') ?  ' 칭찬카드 작성기간입니다.' : (info.quarterInfo.ISRECCLOSED == 'N') ? '칭찬카드 작성이 마감되었습니다.' : '칭찬카드 오픈 예정입니다.');
+  const bannerMsg = ((info.quarterInfo.ISCLOSED == 'N') ?  ' 칭찬카드 작성기간입니다.' : (info.quarterInfo.ISRECCLOSED == 'N') ? ' 칭찬카드 작성이 마감되었습니다.' : ' 칭찬카드 오픈 예정입니다.');
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);

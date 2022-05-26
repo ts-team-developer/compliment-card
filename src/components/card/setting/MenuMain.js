@@ -1,12 +1,11 @@
 import * as React from 'react';
-import PropTypes from 'prop-types';
-import axios from 'axios';
-import { CssBaseline, Box, Button, TextField,  Switch,  InputLabel, FormControl, Select, MenuItem,Grid }  from '@mui/material';
+import { CssBaseline,  TextField,  Switch,  InputLabel, FormControl, Select, MenuItem,Grid }  from '@mui/material';
 import MenuList from './MenuList';
+import { useSelector } from 'react-redux';
 
 export default function WorkerMain() {
   const [searchForm, setSearchForm] = React.useState({'MENU_NM' : "", 'USE_YN' : 'X'});
-  
+  const info = useSelector(state => state.authentication.status);
   const handleChanges =(event) => {
     const{name, value} = event.target;
     setSearchForm({
@@ -17,7 +16,7 @@ export default function WorkerMain() {
 
   React.useEffect(() => {
     
-  }, [searchForm]);
+  }, [searchForm, info]);
  
   return (
     <React.Fragment>
@@ -46,11 +45,6 @@ export default function WorkerMain() {
                     size="small"  fullWidth
                     onChange={handleChanges} />
               </FormControl>
-            </Grid>
-            <Grid item xs={12} md={7} sx={{textAlign : 'right'}}>
-            <FormControl   >
-              <Button size="medium" color="warning"  name="add" variant="contained">메뉴추가</Button>
-            </FormControl>
             </Grid>
           </Grid>
           <MenuList searchForm={searchForm} />

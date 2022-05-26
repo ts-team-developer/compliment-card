@@ -2,10 +2,13 @@ import * as React from 'react';
 import axios from 'axios';
 import { CssBaseline,  TextField,  InputLabel, FormControl, Select, MenuItem,Grid }  from '@mui/material';
 import WorkerList from './WorkerList';
+import { useSelector } from 'react-redux';
 
 export default function WorkerMain() {
   const [searchForm, setSearchForm] = React.useState({'team' : -1, 'name_kor' : "", 'work_sts' : 1});
   const [teamList, setTeamList] = React.useState([]);
+  const info = useSelector(state => state.authentication.status);
+  
   const handleChanges =(event) => {
     const{name, value} = event.target;
     setSearchForm({
@@ -22,7 +25,7 @@ export default function WorkerMain() {
       });
     };
     fetchTeam();
-  }, [searchForm]);
+  }, [searchForm, info]);
  
   return (
     <React.Fragment>

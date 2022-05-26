@@ -6,7 +6,8 @@ import {
     AUTH_LOGOUT,
     ALERT_STATUS,
     REFRESH_TOKEN_SUCCESS,
-    REFRESH_TOKEN_FAILURE
+    REFRESH_TOKEN_FAILURE,
+    QUARTER_STATUS_SUCCESS
 } from './ActionTypes';
 
 // api 인증
@@ -31,7 +32,10 @@ export function loginRequest() {
 
 export function alertHidden(){
     return (dispatch) => {
-        dispatch(hidden());
+        axios.post('/auth/show').then((response) => {
+            console.log("alertHidden : " +JSON.stringify(response))
+            dispatch(hidden());
+        })
     }
 }
 
@@ -40,6 +44,7 @@ export function hidden() {
         type : ALERT_STATUS
     }
 }
+
 
 
 export function login() {
@@ -64,12 +69,10 @@ export function loginFailure() {
 
 export function logoutRequest() {
     return (dispatch) => {
-        console.log('logout')
         return axios.get('/auth/logout').then((response) => {
             if(response.status == 200) {
                 dispatch(logout())
             }
-            console.log(response.status)
             }).catch((error) => {
                 console.log(error)
         })
@@ -118,5 +121,24 @@ export function refreshSuccess(token) {
 export function refreshFailure() {
     return {
         type :REFRESH_TOKEN_FAILURE
+    }
+}
+export function requestQuarterInfo(){
+    return (dispatch) => {
+        axios.get('/auth/quarter').then((response) => {
+            try{
+                dispatch(quarter(response.data));
+            }catch(error) {
+                console.log(error)
+            }
+            
+        })
+    }
+}
+
+export function quarter(data) {
+    return {
+        type : QUARTER_STATUS_SUCCESS,
+        data
     }
 }

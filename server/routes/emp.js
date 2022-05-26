@@ -88,7 +88,7 @@ router.get('/list/all', async(req, res, next) => {
 			if (work_sts != -1) addWhere += ` AND WORK_STS = '${work_sts}' `
 
 			const data = 
-				await connection.query(`SELECT e.disp_order, e.name_kor, e.team, e.rank, e.email, work_sts, update_dt FROM emp e WHERE 1 = 1 ${addWhere} order by work_sts desc `)
+				await connection.query(`SELECT e.disp_order, e.disp_order as id, e.name_kor, e.team, e.rank, e.email, work_sts, update_dt FROM emp e WHERE 1 = 1 ${addWhere} order by work_sts desc `)
 			connection.release();
 			return res.json(data[0])
 		}
@@ -98,38 +98,6 @@ router.get('/list/all', async(req, res, next) => {
     }
 });
 
-router.post('/edit', validList ,async(req, res, next) => {
-  const error = validationResult(req);
-  if(!error.isEmpty()) {
-    console.log(error)
-    return res.status(400).json({error:error.array()})
-  }
-  console.log(JSON.stringify(req.body));
-  console.log(JSON.stringify(req.query));
-	if(req.user === undefined) {
-            res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
-            return ;
-        } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
-            res.status(403).send({message : '잘못된 접근입니다. '});
-            return ;
-        } else {
-			try{
-				let connection = await pool.getConnection(async conn => conn)
-        let updateSql = ` UPDATE EMP SET NAME_KOR ='${req.body.name_kor}', TEAM = '${req.body.team}', RANK = '${req.body.rank}', EMAIL = '${req.body.email}', WORK_STS = '${req.body.work_sts} ' WHERE DISP_ORDER = '${req.body.disp_order}' `;
-        let selectSql = ` SELECT EMAIL FROM EMP WHERE DISP_ORDER != '${req.body.disp_order}' AND EMAIL = '${req.body.email}' `;
-        const emps = await connection.query(selectSql);
-
-        console.log("emp"+JSON.stringify(emps[0].length))
-
-				
-				// const data = await connection.query(sql)
-				connection.release();
-				res.send({message:"제출 성공", lists: 1});
-			} catch (err) {
-				console.log(err)
-				return res.status(500).json(err)}
-		}
-  });
 
   router.get('/team', async(req, res, next) => {
     try{
@@ -165,6 +133,29 @@ router.post('/edit', validList ,async(req, res, next) => {
       }
   });
 
+  router.get('/view', async(req, res, next) => {
+    try{
+      if(req.user === undefined) {
+        res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
+        return ;
+      } else if(req.user.request_token != req.user.loginUser.ACCESS_TOKEN) {
+        res.status(403).send({message : '잘못된 접근입니다. '});
+        return ;
+      } else {
+        let connection = await pool.getConnection(async conn => conn)
+        const {disp_order} = req.query;
+        const data =  await connection.query(`SELECT disp_order, name_kor, team, \`rank\`, email, work_sts FROM EMP WHERE DISP_ORDER = '${disp_order} ' `);
+
+        connection.release();
+        return res.json(data[0])
+      }
+      }catch (err){
+        console.log(err);
+          return res.status(500).json(err)
+      }
+  });
+
+
 
   router.post('/save', validList, async(req,res,next) => {
     try {
@@ -191,37 +182,35 @@ router.post('/edit', validList ,async(req, res, next) => {
           return res.status(401).send({message : '이미 존재하는 이메일입니다. '});
         }
   
-        let sql = `;`;
+        let sql = ``;
     
         if(req.body.disp_order > 0) {
           // 수정 로직
           sql = ` UPDATE EMP SET TEAM = '${req.body.team}',   `;
           sql += ` NAME_KOR ='${req.body.name_kor}', `;
-          sql += ` RANK = '${req.body.rank}', `;
+          sql += ` \`RANK\` = '${req.body.rank}', `;
           sql += ` EMAIL = '${req.body.email}', `;
-          sql += ` WORK_STS = '${req.body.work_sts == "Y" ? 1 : 0}' `;
+          sql += ` WORK_STS = '${req.body.work_sts}' `;
           sql += `  WHERE DISP_ORDER = '${req.body.disp_order}' `;
   
           const data = await connection.query(sql)
           connection.release();
-          res.send({message:"제출 성공", result : data});
+          res.send({message:"수정 되었습니다.", result : data});
   
         } else {
           // 등록 로직
-          sql = ` INSERT INTO \`EMP\` ( DISP_ORDER,NAME_KOR, TEAM, \`RANK\`, EMAIL, WORK_STS, CLASS, ISOUTSOURCING, INPUT_ID, START_DT, UPDATE_DT ) VALUES `
-          sql += ` ((select max(disp_order) + 10 from emp e),'${req.body.name_kor}' ,'${req.body.team}', '${req.body.rank}', '${req.body.email}', '${req.body.work_sts == "Y" ? 1 : 0}' `;
-          sql += ` , '', '0', 'cmn', '', SYSDATE()) `
+          sql = ` INSERT INTO \`EMP\` ( DISP_ORDER,NAME_KOR, TEAM, \`RANK\`, EMAIL, WORK_STS, CLASS, ISOUTSOURCING, INPUT_ID, START_DATE, UPDATE_DT ) VALUES `
+          sql += ` ((select max(disp_order) + 10 from emp e),'${req.body.name_kor}' ,'${req.body.team}', '${req.body.rank}', '${req.body.email}', '1' `;
+          sql += ` , '', '0', 'cmn', DATE_FORMAT(now(), '%Y-%m-%d'), SYSDATE()) `
   
-          console.log(sql)
           const data = await connection.query(sql)
           connection.release();
-          res.send({message:"제출 성공", result : data});
+          res.send({message:"저장 되었습니다.", result : data});
         }
       }
     }catch(error) {
       res.status(500).send({message : '서버에러' + error});
     }
-    
   });
 
 module.exports = router;

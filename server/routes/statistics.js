@@ -31,18 +31,9 @@ pool.getConnection((err, connection) => {
                 return ;
             } else {
                 let connection = await pool.getConnection(async conn => conn)
-
-
-                console.log(req.query);
-                let user = '';
-
-                if(req.query.isPraise=='Y'){
-                    user = 'RECEIVER'    
-                }else {
-                    user = 'SENDER'    
-                }
-        
+                let user = (req.query.isPraise=='Y' ? 'RECEIVER' : 'SENDER');
                 let sql = `SELECT @ROWNUM := @ROWNUM+1 AS id , (SELECT NAME_KOR FROM EMP WHERE EMAIL = P.${user} OR NAME_KOR = P.${user} ) AS name, `;
+
                 sql += `COUNT(CASE WHEN QUARTER LIKE '%1분기' THEN 0 END) AS 'Q1', `;
                 sql += `COUNT(CASE WHEN QUARTER LIKE '%2분기' THEN 0 END) AS 'Q2', `;
                 sql += `COUNT(CASE WHEN QUARTER LIKE '%3분기' THEN 0 END) AS 'Q3', `;
@@ -70,13 +61,18 @@ pool.getConnection((err, connection) => {
             } else {
                 let connection = await pool.getConnection(async conn => conn)
                 
-                let sql = `SELECT SEQ, QUARTER, SENDER, RECEIVER, DATE_FORMAT(SEND_DT,'%Y/%m/%d') AS SEND_DT, SEND_TM, CONTENT FROM PRAISE_CARD  WHERE RECEIVER ='${req.query.receiver }' AND QUARTER ='${req.query.quarter}' `
-
+                let sql = `SELECT SEQ, QUARTER, DATE_FORMAT(SEND_DT,'%Y/%m/%d') AS SEND_DT, SEND_TM, CONTENT,     `
+                sql += ` (SELECT \`VALUE\` FROM CATEGORIES WHERE \`KEY\`= CATEGORY ) AS CATEGORY, `;
+                sql += ` (SELECT NAME_KOR FROM EMP WHERE EMAIL = RECEIVER OR NAME_KOR = RECEIVER ) AS RECEIVER, `;
+                sql += ` (SELECT NAME_KOR FROM EMP WHERE EMAIL = SENDER OR NAME_KOR = SENDER ) AS SENDER `;
+                sql += ` FROM PRAISE_CARD  WHERE QUARTER ='${req.query.quarter}' `;
+                sql += req.query.receiver ? ` AND RECEIVER ='${req.query.receiver}'` : ``;
                 const data = await connection.query(sql)
                 connection.release();
                 return res.json(data)
             }
         } catch (err) {
+            console.log(err)
             return res.status(500).json(err)
         }
     });
@@ -95,7 +91,7 @@ pool.getConnection((err, connection) => {
                 let quarter = req.query.quarter;
 
 
-                let sql = `SELECT @ROWNUM := @ROWNUM+1 AS idx, (SELECT NAME_KOR FROM EMP WHERE EMAIL = P.SENDER OR NAME_KOR = P.SENDER ) AS SENDER, '${quarter}' AS QUARTER, SUM(C.EVALUATION ) AS SUM `
+                let sql = `SELECT @ROWNUM := @ROWNUM+1 AS idx, (SELECT NAME_KOR FROM EMP WHERE EMAIL = P.SENDER OR NAME_KOR = P.SENDER ) AS SENDER, '${quarter}' AS QUARTER, SUM(C.EVALUATION ) AS SUM, P.CONTENT `
                 sql += `FROM PRAISE_CARD P LEFT JOIN CARD_CHECK C ON P.SEQ=C.SEQ, (SELECT @ROWNUM :=0) AS R `;
                 sql += `WHERE P.QUARTER LIKE '${quarter}%' GROUP BY P.SENDER ORDER BY SUM DESC`;
 

@@ -140,8 +140,7 @@ export default function PraiseCard(props) {
                                         <Link name="delete" value={props.card.seq} color="inherit" onClick={handleClick} sx={{textDecoration : 'none'}}>삭제</Link> 
                                     </MenuItem> 
                                 </Menu>
-                            </Box> : null
-                          }  
+                            </Box> : null }  
                         title={ props.searchForm.cards == 4 ?  
                             <div> {props.card.receiver} <Chip color="warning" label={props.card.evaluation} size="small"  /></div>
                             : props.card.receiver } 
@@ -153,9 +152,9 @@ export default function PraiseCard(props) {
                             } 
                     </CardContent>
 
-                    <CardActions disableSpacing>
+                    {/* <CardActions disableSpacing>
                         {props.isRecPeriodYn ? <Evaluation seq={props.card.seq} evaluation={props.card.evaluation} isRecClosed={props.isRecPeriodYn} searchForm = {props.searchForm} /> : null}
-                    </CardActions>
+                    </CardActions> */}
                 </Card>
         </Grid>
       </React.Fragment>

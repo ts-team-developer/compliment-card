@@ -3,11 +3,10 @@ import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import axios from 'axios';
 
 import { connect } from 'react-redux';
-import { loginRequest, logoutRequest } from '../redux/actions/authentication'; 
+import { alertHidden, loginRequest, logoutRequest } from '../redux/actions/authentication'; 
 
 import { LayoutHeader, LayoutMain } from './layout/index';
 import { AlimPopup } from './modal/index'
-import { NotFound, ErrorLayout } from './error/index';
 
 class App extends Component {
   constructor(props) {
@@ -60,6 +59,10 @@ class App extends Component {
     }
   }
 
+  handleClosePopup = () => {
+    this.props.alertHidden();
+  }
+
   render() {
     return (
       <React.Fragment>
@@ -70,7 +73,7 @@ class App extends Component {
                 return (
                   <Route exact path={menu.MENU_URL} component = {() => 
                     <LayoutMain onLogin={this.handleLogin} url={menu.MENU_URL} loginStatus={this.props.status} onLogout={this.handleLogout}  >
-                      <LayoutHeader menuList={this.state.menuList}  />
+                      <LayoutHeader menuList={this.state.menuList} onClose={this.handleClosePopup} />
                     </LayoutMain>
                     }/>)
                   } 
@@ -99,6 +102,9 @@ const mapDispatchToProps = (dispatch) => {
     },
     logoutRequest : () => {
       return dispatch(logoutRequest());
+    },
+    alertHidden : () =>  {
+      return dispatch(alertHidden());
     }
   }
 }

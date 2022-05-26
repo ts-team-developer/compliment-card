@@ -61,21 +61,6 @@ export default function FullWidthTabs() {
 
   return (
     <React.Fragment>
-     
-      {/* <CardContent position="static"  variant="oulined" sx={{backgroudColor: '#fff', padding: 0}}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          indicatorColor="primary"
-          variant="fullWidth"
-          aria-label="full width tabs example"
-          sx={{ backgroudColor: '#fff', border: '1px solid #eee', height : '' }}
-        >
-          <Tab label="년도별 통계" {...a11yProps(0)}  />
-          <Tab label="직원별 통계" {...a11yProps(1)} />
-          <Tab label="점수별 통계" {...a11yProps(2)} />
-        </Tabs>
-      </CardContent> */}
         <SwipeableViews
           axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
           index={value}

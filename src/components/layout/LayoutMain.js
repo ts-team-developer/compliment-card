@@ -21,7 +21,6 @@ class LayoutMain extends Component {
                 message : ''
             }
         }
-
         this.handleClose = this.handleClose.bind(this)
         this.handleCallback = this.handleCallback.bind(this);
 
@@ -30,7 +29,7 @@ class LayoutMain extends Component {
                 axios.get('/auth/isAuthenticated', {params: {'token' : this.props.loginStatus.status.currentUser.ACCESS_TOKEN }})
                 .then(async (response) => {
                     // 자동 로그아웃 연장 유무
-                    if(!this.props.login.isAutoLogout) {
+                    if(this.props.loginStatus.status.result) {
                         if(response.data.result == true && response.data.message != null) {
                             this.setState({
                                 open : true,
@@ -111,7 +110,7 @@ class LayoutMain extends Component {
 const mapStateToProps = (state) => {
    return {
      status : state.authentication.status,
-     login : state.authentication.login
+     login : state.authentication.login,
    }
 }
 const mapDispatchToProps = (dispatch) => {

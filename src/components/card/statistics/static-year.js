@@ -17,15 +17,7 @@ export default function FixedContainer() {
     const isMobile = useMediaQuery("(max-width: 600px)");
     const classes = usePcStyles();
     const mobile = useMobileStyles();
-  const columns = [
-    // { field: 'idx', headerName: '순서', width: 90 },
-     { field: 'name', headerName: '이름', width: 150,},
-    { field: 'Q1', headerName: '1분기', width: 150,},
-    { field: 'Q2', headerName: '2분기', width: 150,},
-    { field: 'Q3', headerName: '3분기', width: 150,},
-    { field: 'Q4', headerName: '4분기', width: 150,}
-  ];
-
+  
 
   const info = useSelector(state => state.authentication.status);
 
@@ -37,6 +29,15 @@ export default function FixedContainer() {
   const [searchForm, setSearchForm] = React.useState({ quarter : quarter , isPraise : 'Y' });
   const [cardStyle, setCardStyle] = React.useState({border : "1px solid rgb(25, 118, 210)",backgroud : "rgba(25, 118, 210, 0.04)"});
   const [card2Style, setCard2Style] = React.useState();
+
+  const columns = [
+    // { field: 'idx', headerName: '순서', width: 90 },
+     { field: 'name', headerName: '이름', width: 150,},
+    { field: 'Q1', headerName: '1분기', width: 150,},
+    { field: 'Q2', headerName: '2분기', width: 150,},
+    { field: 'Q3', headerName: '3분기', width: 150,},
+    { field: 'Q4', headerName: '4분기', width: 150,}
+  ];
 
   
   

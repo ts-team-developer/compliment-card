@@ -11,27 +11,35 @@ class Evaluation extends Component{
             open : false,
             message : '',
             error : false,
-            score : this.props.evaluation
+            score : this.props.evaluation,
+            form : {seq : '', evaluation : '0'}
         }
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange = (e) => {
-        axios.post('/api/evaluation/save',{'seq' : this.props.seq, 'evaluation' : e.target.value}).then( async res => {
-            this.setState({
-                open: true,
-                error : res.status != 200,
-                message : res.status == 200 ? '추천 성공 !' : res.data.message
-            });
-          }).catch(async error => {
-            this.setState({
-                open: true,
-                error :true,
-                message : error.response.data.message,
-                score : this.props.evaluation
-            });
-          });
-
+        this.setState({
+            ...this.state.form,
+            form : {
+                seq : this.props.seq,
+                evaluation : e.target.value
+            }
+        }, () => {
+            axios.post('/api/card/evaluation', this.state.form).then( async res => {
+                this.setState({
+                    open: true,
+                    error : res.status != 200,
+                    message : res.status == 200 ? '추천 성공 !' : res.data.message
+                });
+              }).catch(async error => {
+                this.setState({
+                    open: true,
+                    error :true,
+                    message : error.response.data.message,
+                    score : this.props.evaluation
+                });
+              });
+        })
         setTimeout(() => {
             this.setState({
                 open: false,

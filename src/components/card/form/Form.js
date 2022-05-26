@@ -10,7 +10,7 @@ import { AlimPopup } from '../../modal/index';
 import { usePcStyles, useMobileStyles } from "../../../styles/styles"
 import { useMediaQuery } from "@material-ui/core";
 
-const employeeList= [];
+let employeeList= [];
 
 export default function Form(props) {
     // Style 관련 CSS
@@ -41,7 +41,6 @@ export default function Form(props) {
   }
 
   const handleChange = (e, params) => {
-    // const { name, value } = (typeof params == "undefined") ? e.target : {name : 'receiver', value :params.value}
     const {name , value } = (e.target.name == 'category' || e.target.name=='content') ? e.target : {name : 'receiver', value :params.value};
     setValues({ ...values, [name]: value });
     setResult({...result , 
@@ -64,6 +63,7 @@ export default function Form(props) {
     }, []);
 
     try{
+      employeeList = []
       axios.get('/api/emp/list')
       .then(({data}) => {
         data[0].forEach(element => {

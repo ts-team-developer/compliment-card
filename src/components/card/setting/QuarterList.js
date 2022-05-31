@@ -83,6 +83,8 @@ function SetToolbar(props) {
   }
 
   const handleCancel = () => {
+    console.log(JSON.stringify(selectedRowParam));
+    console.log(JSON.stringify(selected));
     if (!selectedRowParam)  return;
     if(selected == quarter.NEXT_QUARTER) {
       setRows((prevRows) => {

@@ -45,7 +45,7 @@ export default function Form(props) {
     setValues({ ...values, [name]: value });
     setResult({...result , 
       error : !(values.receiver.length > 0 && values.content.length > 100 && values.category.length > 0), 
-      message : values.content.length <  100 ? '내용은 100자 이상 입력해주세요.' : values.receiver.length <= 0 ? '받는 사람을 선택해주세요.' : values.category.length <=0 ? '카테고리를 선택해 주세요.' :''})
+      message : values.content.length <  50 ? '내용은 50자 이상 입력해주세요.' : values.receiver.length <= 0 ? '받는 사람을 선택해주세요.' : values.category.length <=0 ? '카테고리를 선택해 주세요.' :''})
   }
 
   React.useEffect(() => {
@@ -139,7 +139,7 @@ export default function Form(props) {
           <TextField fullWidth
               multiline id="outlined-multiline-static" label="칭찬내용" placeholder="칭찬내용" rows={10} name="content"  required
               helperText={`* ${result.message} [${values.content.length}자 입력 중]`} value={values.content} size={isMobile ? 'small' : 'medium'}
-              error={values.content.length < 100}
+              error={values.content.length < 30}
               onChange={handleChange} />
         </Grid>
       </Grid>

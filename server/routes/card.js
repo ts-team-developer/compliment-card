@@ -155,8 +155,8 @@ router.post('/save', async(req, res, next) => {
         } else if (req.user.quarterInfo.ISCLOSED != 'N') {
             res.status(400).send({message:"칭찬카드 작성 기간이 아닙니다. "})
             return ;
-        } else if(content.length < 30) {
-            res.status(400).send({message:"칭찬 내용은 30자 이상 작성해주세요. "})
+        } else if(content.length < 50) {
+            res.status(400).send({message:"칭찬 내용은 50자 이상 작성해주세요. "})
             connection.release();
             return ;
         } else if (receiver == '') {

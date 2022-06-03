@@ -19,7 +19,7 @@ export default function List(props) {
   // 마감 : quarter : cardes : 안읽은 카드(5) 혹은 전체 카드
   const info = useSelector(state => state.authentication.status);
 
-  const [searchForm, setSearchForm] = React.useState({ quarter : info.quarterInfo.QUARTER, cards : info.quarterInfo.ISCLOSED == 'N' ? '1' : '3' });
+  const [searchForm, setSearchForm] = React.useState({ quarter : info.quarterInfo.QUARTER, cards : info.quarterInfo.ISCLOSED == 'N' ? '1' : '3', category : "ALL" });
   const [result, setResult] = React.useState({error : true, message : '', open : false});
 
   const [posts, setPosts] = React.useState([]);
@@ -74,6 +74,7 @@ export default function List(props) {
 
     fetchQuarter();
     fetchPosts();
+    fetchCategory();
  }, [searchForm, info, result]);
 
  const handleChange = (e) => {
@@ -104,6 +105,7 @@ export default function List(props) {
             <FormControl fullWidth className={isMobile ? mobile.searchEl : classes.searchEl} >
               <InputLabel id="demo-simple-select-label">카테고리</InputLabel>
               <Select labelId="demo-simple-select-label" size="small" id="demo-simple-select" name="category"  className={isMobile ? mobile.searchEl : classes.searchEl} label="카테고리" value={searchForm.category}  onChange={handleChange}>
+                <MenuItem value={"ALL"}>전체</MenuItem>
                 {categoryList ? categoryList.map((el, key) => {
                   return ( <MenuItem value={el.KEY}>{el.VALUE}  </MenuItem>  ) }) : null};
               </Select>

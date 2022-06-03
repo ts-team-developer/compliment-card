@@ -346,7 +346,7 @@ router.post('/editQuarter', async(req, res, next) => {
           } else {
               let connection = await pool.getConnection(async conn => conn)
               // let sql = `SELECT * FROM CLOSED WHERE SUBSTRING_INDEX(QUARTER, '년도', 1) >= 2022 `;
-              let sql = `SELECT KEY, VALUE FROM CATEGORIES WHERE USE_YN = 'Y'`;
+              let sql = `SELECT C.KEY, VALUE FROM CATEGORIES C WHERE USE_YN = 'Y'`;
 
               const data = await connection.query(sql)
               connection.release();

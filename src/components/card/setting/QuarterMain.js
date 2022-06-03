@@ -5,7 +5,7 @@ import QuarterList from './QuarterList';
 import { useSelector, useDispatch } from 'react-redux';
 
 
-export default function WorkerMain() {
+export default function QuarterMain() {
   const [searchForm, setSearchForm] = React.useState({'year' : 0, 'quarter' : 0, });
   const [yearList, setYearList] = React.useState([]);
   const info = useSelector(state => state.authentication.status);
@@ -13,7 +13,7 @@ export default function WorkerMain() {
   const handleChanges =(event) => {
     const{name, value} = event.target;
     setSearchForm({
-      ...searchForm , 
+      ...searchForm ,
       [name] : value
     })
   }
@@ -27,7 +27,7 @@ export default function WorkerMain() {
     };
     fetchYear();
   }, [searchForm, info]);
- 
+
   return (
     <React.Fragment>
       <CssBaseline />

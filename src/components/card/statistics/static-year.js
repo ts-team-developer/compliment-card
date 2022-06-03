@@ -17,7 +17,7 @@ export default function FixedContainer() {
     const isMobile = useMediaQuery("(max-width: 600px)");
     const classes = usePcStyles();
     const mobile = useMobileStyles();
-  
+
 
   const info = useSelector(state => state.authentication.status);
 
@@ -39,8 +39,8 @@ export default function FixedContainer() {
     { field: 'Q4', headerName: '4분기', width: 150,}
   ];
 
-  
-  
+
+
   const quarterList= [];
 
    axios.get('/api/quarter/listOfYear' , {params: { sort : 'Y' }} )
@@ -81,7 +81,7 @@ export default function FixedContainer() {
     setSearchForm({quarter:value.label, isPraise : 'N'})
   }
 
-  
+
   setCard2Style( { border : "1px solid rgb(25, 118, 210)",backgroud : "rgba(25, 118, 210, 0.04)" })
   setCardStyle( { border : "1px solid rgb(211, 211, 211)", backgroud : "white" })
 }
@@ -100,21 +100,21 @@ export default function FixedContainer() {
               onChange={(event, newValue) => {
                 setValue(newValue);
               }}
-              renderInput={(params) => <TextField {...params} label="칭찬카드 분기" />}        
+              renderInput={(params) => <TextField {...params} label="칭찬카드 분기" />}
               size="small" />
           </FormControl>
           </Grid>
           <Grid item xs={12} md={3}>
           <FormControl fullWidth className={isMobile ? mobile.searchEl : classes.searchEl}>
           <ButtonGroup variant="outlined" aria-label="outlined button group" size="medium" fullWidth >
-              <Button onClick={handleClick} fullWidth >칭찬함</Button>
-              <Button  onClick={handleClick2} fullWidth >칭찬받음</Button>
+              <Button onClick={handleClick2} fullWidth >칭찬함</Button>
+              <Button  onClick={handleClick} fullWidth >칭찬받음</Button>
             </ButtonGroup>
           </FormControl>
           </Grid>
       </Grid>
-      
-          
+
+
                 <div style={{ height: 400, width: '100%', padding : 0 }}>
                   <DataGrid getRowId={(rows) => rows.id}
                     rows={rows}

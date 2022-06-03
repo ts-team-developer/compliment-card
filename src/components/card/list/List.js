@@ -24,9 +24,10 @@ export default function List(props) {
 
   const [posts, setPosts] = React.useState([]);
   const [quarterList, setQuarterList] = React.useState([]);
-  
+  const [categoryList, setCategoryList] = React.useState([]);
+
   // 추천 카드 CARD_CHECK
-  
+
   React.useEffect(() => {
     const fetchPosts = async () => {
       // if(searchForm.quarter == info.quarterInfo.QUARTER && info.quarterInfo.ISCLOSED == 'N' && searchForm.cards != '1') {
@@ -58,7 +59,18 @@ export default function List(props) {
           console.log(error)
         }
       });
-    };                                           
+    };
+
+    const fetchCategory = async () => {
+      axios.get('/api/quarter/category')
+      .then(({data}) => {
+        try{
+          setCategoryList(data[0])
+        }catch(error) {
+          console.log(error)
+        }
+      });
+    };
 
     fetchQuarter();
     fetchPosts();
@@ -88,10 +100,19 @@ export default function List(props) {
               </Select>
             </FormControl>
           </Grid>
+          <Grid item xs={12} md={3}>
+            <FormControl fullWidth className={isMobile ? mobile.searchEl : classes.searchEl} >
+              <InputLabel id="demo-simple-select-label">카테고리</InputLabel>
+              <Select labelId="demo-simple-select-label" size="small" id="demo-simple-select" name="category"  className={isMobile ? mobile.searchEl : classes.searchEl} label="카테고리" value={searchForm.category}  onChange={handleChange}>
+                {categoryList ? categoryList.map((el, key) => {
+                  return ( <MenuItem value={el.KEY}>{el.VALUE}  </MenuItem>  ) }) : null};
+              </Select>
+            </FormControl>
+          </Grid>
           <Grid item xs={12} md={2} >
             <FormControl fullWidth className={isMobile ? mobile.searchEl : classes.searchEl}>
                 <InputLabel id="demo-simple-select-label">카드</InputLabel>
-                <Select labelId="demo-simple-select-label" id="demo-simple-select" className={isMobile ? mobile.searchEl : classes.searchEl}  name="cards" label="카드"  size="small" value={searchForm.cards}  
+                <Select labelId="demo-simple-select-label" id="demo-simple-select" className={isMobile ? mobile.searchEl : classes.searchEl}  name="cards" label="카드"  size="small" value={searchForm.cards}
                   onChange={handleChange}>
                   {/* <MenuItem value={5}>안 읽은 카드</MenuItem> */}
                   {/* <MenuItem value={4}>추천카드</MenuItem> */}
@@ -109,11 +130,11 @@ export default function List(props) {
         <Grid container spacing={3}>
           {posts ? posts.map((el, key) => {
           const praiseCard = {
-            seq : el.SEQ, 
-            receiver : el.RECEIVER, 
-            sender : el.SENDER, 
+            seq : el.SEQ,
+            receiver : el.RECEIVER,
+            sender : el.SENDER,
             content : el.CONTENT,
-            evaluation : el.EVALUATION, 
+            evaluation : el.EVALUATION,
             category : el.CATEGORY,
             sendDt : moment(el.SEND_DT).format('YYYY-MM-DD') + " " + el.SEND_TM,
             readDt : el.READ_DT === undefined ? '' : moment(el.READ_DT).format('YYYY-MM-DD') + " " + el.READ_TM
@@ -121,9 +142,7 @@ export default function List(props) {
           const isRecPeriodYn = (info.quarterInfo.ISRECCLOSED == 'N' && info.quarterInfo.ISCLOSED == 'Y' && el.SENDER != info.currentUser.email && info.quarterInfo.QUARTER == searchForm.quarter );
           return  ( <PraiseCard card = {praiseCard} searchForm={searchForm} isClosed = {info.quarterInfo.ISCLOSED} isRecPeriodYn={isRecPeriodYn} /> )  } ) : null}
         </Grid>
-      </CardContent> 
+      </CardContent>
     </React.Fragment>
   );
 }
-
- 

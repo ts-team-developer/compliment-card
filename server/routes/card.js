@@ -24,13 +24,13 @@ pool.getConnection((err, connection) => {
 router.get('/list', async(req, res, next) => {
     try{
             // cards : 5 - 안 읽은 카드, 4 - 추천카드(o), 3 - 전체카드(o) , 2 - 받은 카드 1-  내가쓴카드
-            const {cards, score, quarter} = req.query;
+            const {cards, score, quarter, category} = req.query;
             console.log(cards)
             let connection = await pool.getConnection(async conn => conn);
             let sql = ``;
             let quarterSql = ``;
 
-            if(quarter == 0) quarterSql = req.user.quarterInfo.QUARTER 
+            if(quarter == 0) quarterSql = req.user.quarterInfo.QUARTER
             else quarterSql = quarter;
 
             if(req.user === undefined) {
@@ -70,10 +70,11 @@ router.get('/list', async(req, res, next) => {
                     sql += `   , (SELECT VALUE FROM CATEGORIES WHERE \`KEY\` = CATEGORY) AS CATEGORY ` ;
                     sql += ` FROM praise_card p WHERE SENDER IN ('${req.user.loginUser.EMAIL}', '${req.user.loginUser.NAME_KOR}') AND QUARTER ='${quarterSql}' `;
                 }
-    
+
+                sql += ` AND CATEGORY = ${category}`;
                 const data = await connection.query(sql);
                 connection.release();
-    
+
                 return res.json(data)
             }
     }catch (err){
@@ -95,7 +96,7 @@ router.get('/getEvaluationQuery', async(req, res, next) => {
             connection.release();
             return res.json(data);
         }
-        
+
     }catch(err) {
         console.log(err)
     }
@@ -133,7 +134,7 @@ router.post('/save', async(req, res, next) => {
     let result = ((seq == 0) ? true : (receiver != oriReceiver));
     // 받은사람 중복확인
     const totalCnt = await connection.query(`SELECT COUNT(*) AS COUNT FROM praise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}' `);
-    
+
     const sendQry = `SELECT COUNT(*) AS COUNT FROM praise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}' AND RECEIVER = '${receiver}'`
     const sendCnt =  await connection.query( sendQry );
     const resultCard = await connection.query(` SELECT COUNT(*) AS COUNT FROM EMP WHERE WORK_STS = 1 AND EMAIL = '${receiver}'`);
@@ -144,7 +145,7 @@ router.post('/save', async(req, res, next) => {
 
     const preCard = await connection.query(preSql);
     const afterCard = await connection.query( ` SELECT COUNT(*) AS COUNT FROM EMP WHERE TEAM NOT IN ( SELECT TEAM FROM EMP WHERE EMAIL = '${req.user.loginUser.EMAIL}' ) AND EMAIL = '${receiver}'`);
-    
+
     try{
         if(req.user === undefined) {
             res.status(403).send({message : '로그인 정보가 존재하지 않습니다.'});
@@ -197,13 +198,13 @@ router.post('/save', async(req, res, next) => {
                 sql += ` UPDATE praise_card SET RECEIVER = '${receiver}' , SEND_DT = DATE_FORMAT(NOW(), '%Y-%m-%d'), SEND_TM=DATE_FORMAT(NOW(), '%H:%i:%s'), CATEGORY = '${category}' , CONTENT='${content}'`;
                 sql += `  WHERE SEQ =  ${seq} AND SENDER = '${req.user.loginUser.EMAIL}' `;
             }
-                
+
             const data = await connection.query(sql)
             connection.release();
 
             res.send({message : "칭찬카드가 정상적으로 작성되었습니다.", lists : data});
         }
-        
+
     } catch (err) {
         console.log(err)
         return res.status(500).json(err)
@@ -312,16 +313,19 @@ router.post('/delete', async(req, res, next) => {
             let sql = ` SELECT COUNT(*) AS COUNT FROM praise_card A LEFT JOIN EMP B ON A.RECEIVER = B.EMAIL `
             sql += `LEFT JOIN EMP C ON A.SENDER = C.EMAIL  AND B.WORK_STS = 1 `
             sql += ` WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}'  AND B.TEAM != C.TEAM and SEQ != ${req.body.seq}`;
-    
+
+            let selectCountAllMyCard = 'SELECT count(*) FROM parise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}';
+            const selectCountAllMyCardData = await connection.query(selectCountAllMyCard);
+
             let selectSenderSql = `SELECT SENDER FROM praise_card WHERE SEQ = '${req.body.seq}' `;
             const data = await connection.query(sql)
             const selectSender = await connection.query(selectSenderSql);
-            
+
             if(req.user.quarterInfo.ISCLOSED != 'N') {
                 res.status(400).send({message:"칭찬카드 작성 기간이 아닙니다. "})
                 connection.release();
                 return ;
-            } else if(data[0][0].COUNT == 0) {
+            } else if(data[0][0].COUNT == 0 && selectCountAllMyCardData[0][0] > 1) {
                 res.status(400).send({message:"타 팀 먼저 칭찬 후 삭제해주세요 "})
                 connection.release();
                 return ;

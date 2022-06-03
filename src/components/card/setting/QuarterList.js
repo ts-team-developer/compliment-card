@@ -20,12 +20,12 @@ function SetToolbar(props) {
 
     if(selected == null) {
       setRows((oldRows) => [{ id : quarter.NEXT_QUARTER, QUARTER: quarter.NEXT_QUARTER , ISCLOSED : 0 }, ...oldRows ]);
-      setForm({QUARTER : quarter.NEXT_QUARTER, ISCLOSED : 'N' })
+      setForm({QUARTER : quarter.NEXT_QUARTER, ISCLOSED : 'N', ISRECCLOSED : 'N'})
       setSelected(quarter.NEXT_QUARTER);
       setRowModesModel((oldModel) => ({
         [quarter.NEXT_QUARTER] : { mode: GridRowModes.Edit },
       }));
-    } 
+    }
   };
 
   const handleSaveOrEdit = (event) => {
@@ -46,19 +46,19 @@ function SetToolbar(props) {
 
   const handleDelete = () => {
     dispatch(requestQuarterInfo());
-    setResult({  
-      ...result,  
-      open : false, 
+    setResult({
+      ...result,
+      open : false,
       callback : {
           ...result.callback,
           open : true,
-      } }) 
+      } })
   }
 
   const handleRequestSave = () => {
     axios.post(`/api/quarter/save`, form).then(res => {
         dispatch(requestQuarterInfo());
-          setResult({...result, 
+          setResult({...result,
             open: true,
             variant : 'success',
             message : res.data.message,
@@ -71,7 +71,7 @@ function SetToolbar(props) {
             [res.data.quarter]: { mode: GridRowModes.View },
           }));
         }).catch(error => {
-          setResult({...result, 
+          setResult({...result,
             open: true,
             variant : 'error',
             message : error.response.data.message
@@ -85,7 +85,6 @@ function SetToolbar(props) {
   const handleCancel = () => {
     console.log(JSON.stringify(selectedRowParam));
     console.log(JSON.stringify(selected));
-    if (!selectedRowParam)  return;
     if(selected == quarter.NEXT_QUARTER) {
       setRows((prevRows) => {
         const rowToDeleteIndex = prevRows.length
@@ -114,18 +113,18 @@ function SetToolbar(props) {
     setResult({...result, open: false})
   };
   const handlePopupClose = () => {
-    setResult({  
-        ...result,  
-        open : false, 
+    setResult({
+        ...result,
+        open : false,
         callback : {
             ...result.callback,
             open : false,
-        } }) 
+        } })
 }
 
 const handleCallback = () => {
   axios.post('/api/quarter/delete', {'QUARTER' :selectedRowParam.id}).then( async res => {
-    setResult({...result, 
+    setResult({...result,
       open: true,
       variant : res.status == 200 ? 'success' : 'error',
       message : res.data.message,
@@ -135,9 +134,9 @@ const handleCallback = () => {
         open : false
       }
     });
-    
+
   }).catch(async error => {
-    setResult({...result, 
+    setResult({...result,
       open: true,
       variant : 'error',
       message : '삭제 실패',
@@ -176,7 +175,7 @@ const handleCallback = () => {
         </Button>
       </React.Fragment> }
 
-      {selected == null && 
+      {selected == null &&
         <Button onClick={addRow} onMouseDown={handleMouseDown} color="warning" sx={{ mr: 1 }} variant="contained" >
           분기추가
         </Button>}
@@ -210,7 +209,7 @@ export default function WorkerList(props) {
   const [selected, setSelected] = React.useState(null);
   const [quarter, setQuarter] = React.useState(null);
   const [result, setResult] = React.useState({open: false, variant : 'error', message : '', status : false, callback: {open : false, messge : '', error : false}});
-  
+
   const [rows, setRows] = React.useState([]);
   const [form, setForm] = React.useState(null);
   const info = useSelector(state => state.authentication.status);
@@ -260,7 +259,7 @@ export default function WorkerList(props) {
 
   // dataGrid 데이터
   const headCells = [
-    { field: 'QUARTER', width: 200, headerName: '분기', 
+    { field: 'QUARTER', width: 200, headerName: '분기',
         preProcessEditCellProps: (params) => {
           params.row.QUARTER = params.props.value;
           setForm(params.row)
@@ -284,7 +283,7 @@ export default function WorkerList(props) {
         headerName: '분기마감여부',
         editable: true,
         width: 140,
-        type : 'boolean', 
+        type : 'boolean',
         preProcessEditCellProps: (params) => {
           params.row.ISRECCLOSED = params.props.value ? 'Y' : 'N';
           setForm(params.row)

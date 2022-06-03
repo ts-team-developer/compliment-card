@@ -18,11 +18,11 @@ export default function ListLayout() {
                         <Typography variant="h5" component="div" className={classes.title} >
                           <b>평가방법</b>
                         </Typography>
-                      
-                        <Typography variant="subtitle2" className={classes.descriptions}>
-                            평가는 5점 척도입니다. 좋은 미담 사례를 위주로 높은 평가 부탁드립니다. 
-                        </Typography>
 
+                        <Typography variant="subtitle2" className={classes.descriptions}>
+                            창의 / 긍정 / 열정 / 약속 별 칭찬 많이 받은 사람 선정 후 포상
+                        </Typography>
+/* 받은 카드 수이므로 평가 제외
                         <Typography variant="subtitle2" className={classes.descriptions}>
                             평가 점수의 합이 높은 10개의 칭찬카드를 분기 모임 시 현장 투표 진행합니다. <br/>
                         </Typography>
@@ -34,12 +34,13 @@ export default function ListLayout() {
                         <Typography variant="subtitle2" className={classes.descriptions}>
                             본인이 작성한 카드는 본인을 제외한 전 직원이 오점 척도로 평가하여 본인에게만 피드백을 드릴테니, 다른 칭찬카드 작성 시에 분발해주세요. <br/>
                         </Typography>
-                        
+                        */
+
                     </CardMedia>
 
                     {/* Card Content */}
                     <CardContent className={classes.cardContent}>
-                        <List  />    
+                        <List  />
                     </CardContent>
                 </Card>
             </React.Fragment>

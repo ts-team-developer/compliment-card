@@ -23,7 +23,7 @@ export default function Form(props) {
     const [values, setValues] = React.useState({receiver : '', content : '', seq : 0, token : '', category : ''});
     const [result, setResult] = React.useState({ url : '', error : true, message : '', open : false});
     const [categories, setCategories] = React.useState([]);
-    
+
   // 저장버튼 클릭 이벤트
   const handleOpen = async () => {
       axios.post('/api/card/save', values).then( async res => {
@@ -31,10 +31,10 @@ export default function Form(props) {
       }).catch(async error => {
         setResult({ ...result, open : true, error :true, message : error.response.data.message , url : '' })
       });
-    } 
-    
-  const handleClose = () => { 
-    setResult({  ...result,  open : false }) 
+    }
+
+  const handleClose = () => {
+    setResult({  ...result,  open : false })
     if(!result.error) {
       history.push('/view/list')
     }
@@ -43,8 +43,8 @@ export default function Form(props) {
   const handleChange = (e, params) => {
     const {name , value } = (e.target.name == 'category' || e.target.name=='content') ? e.target : {name : 'receiver', value :params.value};
     setValues({ ...values, [name]: value });
-    setResult({...result , 
-      error : !(values.receiver.length > 0 && values.content.length > 100 && values.category.length > 0), 
+    setResult({...result ,
+      error : !(values.receiver.length > 0 && values.content.length > 100 && values.category.length > 0),
       message : values.content.length <  50 ? '내용은 50자 이상 입력해주세요.' : values.receiver.length <= 0 ? '받는 사람을 선택해주세요.' : values.category.length <=0 ? '카테고리를 선택해 주세요.' :''})
   }
 
@@ -52,9 +52,9 @@ export default function Form(props) {
     axios.get('/api/quarter/detail').then(({data}) => {
       if(data[0][0]) {
         if(data[0][0].isClosed == 'Y') {
-          setResult({...result , 
+          setResult({...result ,
             open : true,
-            error : false, 
+            error : false,
             message : '칭찬카드 작성기간이 아닙니다. ',
             url : '/view/list'
           });
@@ -74,13 +74,13 @@ export default function Form(props) {
       console.log(err)
     }
 
-   
-    
+
+
     try{
       // 수정폼일 시 SEQ값으로 데이터를 조회한다.
       axios.get('/api/card/detail', {params: { seq : location.state.seq }})
       .then(({data}) => {
-        setValues({ ...values, 
+        setValues({ ...values,
           seq : data[0][0].SEQ,
           receiver : data[0][0].RECEIVER,
           content : data[0][0].CONTENT,
@@ -119,8 +119,8 @@ export default function Form(props) {
         </FormControl>
         </Grid>
         <Grid item xs={12} md={10}>
-          <Autocomplete  disablePortal id="combo-box-demo" 
-            options={employeeList} 
+          <Autocomplete  disablePortal id="combo-box-demo"
+            options={employeeList}
             className={isMobile ? mobile.searchEl : classes.searchEl}
             size={isMobile ? 'small' : 'medium'}
             renderInput={(params) => {
@@ -131,7 +131,7 @@ export default function Form(props) {
                   }
                 return (<TextField fullWidth className={isMobile ? mobile.searchEl : classes.searchEl} {...params} label="받는사람" size={isMobile ? 'small' : 'medium'} required error={params.inputProps.value.length == 0}  onChange={handleChange} />)
               }
-            }   
+            }
             onChange={(e, params) => { handleChange(e, params)}}
             />
         </Grid>
@@ -139,11 +139,11 @@ export default function Form(props) {
           <TextField fullWidth
               multiline id="outlined-multiline-static" label="칭찬내용" placeholder="칭찬내용" rows={10} name="content"  required
               helperText={`* ${result.message} [${values.content.length}자 입력 중]`} value={values.content} size={isMobile ? 'small' : 'medium'}
-              error={values.content.length < 30}
+              error={values.content.length < 50}
               onChange={handleChange} />
         </Grid>
       </Grid>
-      
+
       {/* 저장, 목록으로 가는 버튼 */}
       <CardActions className={classes.formButton}>
         <Grid container spacing={2} >

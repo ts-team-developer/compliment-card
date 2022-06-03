@@ -314,7 +314,7 @@ router.post('/delete', async(req, res, next) => {
             sql += `LEFT JOIN EMP C ON A.SENDER = C.EMAIL  AND B.WORK_STS = 1 `
             sql += ` WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}'  AND B.TEAM != C.TEAM and SEQ != ${req.body.seq}`;
 
-            let selectCountAllMyCard = 'SELECT count(*) FROM parise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}';
+            let selectCountAllMyCard = `SELECT count(*) FROM parise_card WHERE QUARTER = '${req.user.quarterInfo.QUARTER}' AND SENDER = '${req.user.loginUser.EMAIL}'`;
             const selectCountAllMyCardData = await connection.query(selectCountAllMyCard);
 
             let selectSenderSql = `SELECT SENDER FROM praise_card WHERE SEQ = '${req.body.seq}' `;

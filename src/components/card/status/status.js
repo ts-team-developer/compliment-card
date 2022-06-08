@@ -75,7 +75,7 @@ export default function FixedContainer() {
 
   const handleClick = () => {
     if(value.label==undefined){
-      setSearchForm({quarter:info.quarterInfo.QUARTER, cards:1})  
+      setSearchForm({quarter:info.quarterInfo.QUARTER, cards:1})
     }else{
       setSearchForm({quarter:value.label, cards:1})
     }
@@ -87,7 +87,7 @@ export default function FixedContainer() {
 
   const handleClick2 = () => {
     if(value.label==undefined){
-      setSearchForm({quarter:info.quarterInfo.QUARTER, cards:2})  
+      setSearchForm({quarter:info.quarterInfo.QUARTER, cards:2})
     }else{
       setSearchForm({quarter:value.label, cards:2})
     }
@@ -95,12 +95,12 @@ export default function FixedContainer() {
     backgroud : "rgba(211, 47, 47, 0.04)" })
     change1();
     change3();
-    
+
   }
-  
+
   const handleClick3 = () => {
     if(value.label==undefined){
-      setSearchForm({quarter:info.quarterInfo.QUARTER, cards:3})  
+      setSearchForm({quarter:info.quarterInfo.QUARTER, cards:3})
     }else{
       setSearchForm({quarter:value.label, cards:3})
     }
@@ -149,20 +149,20 @@ export default function FixedContainer() {
                   <Grid container spacing={1}>
                     <Grid item xs={12} md={3}>
                       <Badge badgeContent={totalMembers} color="primary" className={mobile.fullWidth}  >
-                        <Button variant="outlined" style={card1Style} onClick={handleClick} className={mobile.fullWidth}  >전체조회</Button>  
-                      </Badge> 
+                        <Button variant="outlined" style={card1Style} onClick={handleClick} className={mobile.fullWidth}  >전체조회</Button>
+                      </Badge>
                     </Grid>
-                    {(info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='N' ) && 
+                    {(info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='N' ) &&
                       <Grid item xs={12} md={3}>
                         <Badge badgeContent={unwrittenMembers} color="error" className={mobile.fullWidth} >
-                          <Button variant="outlined" color="error"  style={card2Style} onClick={handleClick2} className={mobile.fullWidth}>미작성조회</Button>  
-                        </Badge> 
+                          <Button variant="outlined" color="error"  style={card2Style} onClick={handleClick2} className={mobile.fullWidth}>미작성조회</Button>
+                        </Badge>
                       </Grid>
                     }
-                    {(info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='Y' &&  info.quarterInfo.ISCLOSED=='N') && 
+                    {(info.quarterInfo.QUARTER==searchForm.quarter && info.quarterInfo.ISCLOSED=='Y' &&  info.quarterInfo.ISCLOSED=='N') &&
                       <Grid item xs={12} md={3}>
                         <Badge badgeContent={unreadMembers} color="error" className={mobile.fullWidth}>
-                          <Button variant="outlined" color="error"  style={card3Style}  onClick={handleClick3} className={mobile.fullWidth} >미투표조회</Button>   
+                          <Button variant="outlined" color="error"  style={card3Style}  onClick={handleClick3} className={mobile.fullWidth} >미투표조회</Button>
                         </Badge>
                       </Grid>
                     }
@@ -171,13 +171,13 @@ export default function FixedContainer() {
               </Grid>
             </Box>
           </CardMedia>
-       
+
           <CardContent>
             <div style={{ height: 600, width: '100%' }}>
               <DataGrid getRowId={(rows) => rows.idx}
                 rows={rows}
                 columns={columns}
-                pageSize={10}
+                pageSize={rows.length}
                 rowsPerPageOptions={[5]}
               />
             </div>

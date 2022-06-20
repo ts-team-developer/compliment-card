@@ -43,7 +43,7 @@ var validList = [
     }
   }),
   body("team").custom(value => {
-    var teamList =["캐리엠팀", "서비스팀", "솔루션사업팀", "서비스사업팀", "TS팀", "경영관리팀", "BI팀", "임원" ];
+    var teamList =["캐리엠운영팀","캐리엠개발팀", "서비스팀", "솔루션사업팀", "서비스사업팀", "TS팀", "경영관리팀", "BI1팀","BI2팀", "RND팀","임원" ];
     var count =0 ;
     for(var i  =0 ; i < teamList.length; i++) {
       if(teamList[i] == value.trim()) {

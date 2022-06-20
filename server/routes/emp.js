@@ -108,7 +108,7 @@ router.get('/list/all', async(req, res, next) => {
         res.status(403).send({message : '잘못된 접근입니다. '});
         return ;
       } else {
-        return res.json(["캐리엠팀", "서비스팀", "솔루션사업팀", "서비스사업팀", "TS팀", "경영관리팀", "BI팀", "임원" ])
+        return res.json(["캐리엠운영팀","캐리엠개발팀", "서비스팀", "솔루션사업팀", "서비스사업팀", "TS팀", "경영관리팀", "BI1팀","BI2팀", "RND팀","임원" ])
       }
       }catch (err){
         console.log(err);
